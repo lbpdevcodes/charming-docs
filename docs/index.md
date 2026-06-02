@@ -20,7 +20,7 @@ New users:
 App builders:
 
 1. [Routing]({{ '/docs/routing/' | relative_url }})
-2. [Controllers & Templates]({{ '/docs/controllers-and-views/' | relative_url }})
+2. [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }})
 3. [State]({{ '/docs/state/' | relative_url }})
 4. [Database]({{ '/docs/database/' | relative_url }})
 
@@ -42,7 +42,7 @@ Maintainers:
 | [Getting Started]({{ '/docs/getting-started/' | relative_url }}) | Build and run a generated Charming app. |
 | [Core Concepts]({{ '/docs/core-concepts/' | relative_url }}) | App architecture, runtime flow, ephemeral controllers, and state. |
 | [Routing]({{ '/docs/routing/' | relative_url }}) | `root`, `screen`, dynamic params, route titles, and route order. |
-| [Controllers & Templates]({{ '/docs/controllers-and-views/' | relative_url }}) | Actions, `render :show`, `render_template`, key bindings, commands, timers, and tasks. |
+| [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }}) | Actions, `render :show`, `render_template`, key bindings, commands, timers, and tasks. |
 | [Layouts]({{ '/docs/layouts/' | relative_url }}) | Template layouts, `yield_content`, split panes, overlays, responsive layouts, and styles. |
 | [State]({{ '/docs/state/' | relative_url }}) | `ApplicationState`, typed attributes, validations, and session-backed state. |
 | [Database]({{ '/docs/database/' | relative_url }}) | Optional SQLite persistence with Active Record models and migrations. |

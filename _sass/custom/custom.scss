@@ -137,10 +137,9 @@ strong, b {
   border-radius: 2px;
 }
 
+// Outer wrapper owns the background, accent stripe, and border.
 .main-content div.highlighter-rouge,
-.main-content figure.highlight,
-.main-content pre.highlight,
-.main-content div.highlight {
+.main-content figure.highlight {
   background: var(--bg-elevated);
   border-left: 3px solid var(--neon-cyan);
   border-radius: 2px;
@@ -149,9 +148,14 @@ strong, b {
     0 0 24px -8px rgba(0, 240, 255, 0.35);
 }
 
-.main-content pre.highlight,
-.main-content div.highlight pre {
+// Inner Pygments elements are transparent so the wrapper's chrome shows once.
+.main-content div.highlighter-rouge .highlight,
+.main-content div.highlighter-rouge pre.highlight,
+.main-content figure.highlight .highlight,
+.main-content figure.highlight pre {
   background: transparent;
+  border: 0;
+  box-shadow: none;
   color: var(--text-primary);
 }
 
@@ -315,19 +319,18 @@ strong, b {
 .landing-main {
   position: relative;
   width: 100%;
-  min-height: 100vh;
   padding: 0;
 }
 
 .landing-hero {
   position: relative;
   width: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 14vh;
+  padding-top: 10vh;
+  padding-bottom: 8vh;
   overflow: hidden;
   background:
     linear-gradient(
@@ -439,6 +442,611 @@ strong, b {
   );
 }
 
+// ============================================================================
+// LANDING SECTIONS BELOW THE HERO
+// All scoped under .landing-page so the docs body never inherits any of this.
+// ============================================================================
+
+.landing-page {
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  section.landing-showcase,
+  section.landing-stack,
+  section.landing-philosophy,
+  section.landing-quickstart,
+  section.landing-cta {
+    position: relative;
+    padding: 6rem 1.5rem;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  section.landing-showcase::before,
+  section.landing-stack::before,
+  section.landing-philosophy::before,
+  section.landing-quickstart::before,
+  section.landing-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 2px,
+      rgba(0, 0, 0, 0.10) 2px,
+      rgba(0, 0, 0, 0.10) 3px
+    );
+    mix-blend-mode: multiply;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 2;
+  }
+  .section-kicker {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--neon-purple);
+    opacity: 0.8;
+    margin-bottom: 0.75rem;
+  }
+  .section-header h2 {
+    font-family: var(--font-heading);
+    font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+    letter-spacing: 0.06em;
+    margin: 0;
+    color: var(--neon-cyan);
+    text-shadow: var(--glow-cyan);
+  }
+
+  // 1. INSTALL PROMPT — bare typographic row, no frame ---------------------
+  .install-prompt {
+    position: relative;
+    z-index: 30;
+    margin: 1.75rem auto 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    font-family: var(--font-mono);
+    line-height: 1;
+  }
+
+  .install-glyph {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 6px rgba(0, 240, 255, 0.55);
+    user-select: none;
+  }
+
+  .install-cmd {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--text-primary);
+    background: transparent;
+    border: none;
+    padding: 0;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .install-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.35rem;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0.2rem 0.35rem;
+    cursor: pointer;
+    transition: color 140ms ease, transform 140ms ease;
+  }
+  .install-copy:hover {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 6px rgba(0, 240, 255, 0.55);
+
+    .install-copy-icon {
+      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.6));
+    }
+  }
+  .install-copy.is-copied {
+    color: var(--neon-yellow);
+    text-shadow: 0 0 6px rgba(255, 211, 25, 0.55);
+
+    .install-copy-icon {
+      filter: drop-shadow(0 0 4px rgba(255, 211, 25, 0.6));
+    }
+  }
+
+  .install-copy-icon {
+    transition: filter 140ms ease;
+  }
+
+  // Terminal window chrome (shared) ----------------------------------------
+  .terminal-window {
+    position: relative;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-dim);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(0, 240, 255, 0.08),
+      0 18px 60px -20px rgba(0, 0, 0, 0.7),
+      0 0 60px -20px rgba(0, 240, 255, 0.35);
+  }
+
+  .terminal-window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 2px,
+      rgba(0, 0, 0, 0.14) 2px,
+      rgba(0, 0, 0, 0.14) 3px
+    );
+    mix-blend-mode: multiply;
+    z-index: 3;
+  }
+
+  .terminal-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.85rem;
+    background: linear-gradient(180deg, #1f1252 0%, #170e3d 100%);
+    border-bottom: 1px solid var(--border-dim);
+    position: relative;
+    z-index: 2;
+  }
+
+  .terminal-dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .terminal-dot--pink   { background: var(--neon-pink);   box-shadow: 0 0 6px rgba(255, 41, 117, 0.7); }
+  .terminal-dot--yellow { background: var(--neon-yellow); box-shadow: 0 0 6px rgba(255, 211, 25, 0.6); }
+  .terminal-dot--cyan   { background: var(--neon-cyan);   box-shadow: 0 0 6px rgba(0, 240, 255, 0.7); }
+
+  .terminal-title {
+    margin-left: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+
+  .terminal-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+    position: relative;
+    z-index: 2;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(0, 240, 255, 0.06), transparent 70%),
+      var(--bg-elevated);
+  }
+
+  .terminal-body pre.tui {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--text-primary);
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  // 2. SHOWCASE — animated TUI demo ----------------------------------------
+  section.landing-showcase {
+    background:
+      radial-gradient(ellipse at 0% 30%, rgba(185, 103, 255, 0.10), transparent 55%),
+      radial-gradient(ellipse at 100% 80%, rgba(0, 240, 255, 0.08), transparent 55%),
+      var(--bg-void);
+
+    .showcase-frame {
+      position: relative;
+      z-index: 2;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .showcase-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      border: 0;
+      filter: saturate(1.05) contrast(1.02);
+    }
+
+    .showcase-caption {
+      text-align: center;
+      margin: 1.5rem auto 0;
+      max-width: 600px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      position: relative;
+      z-index: 2;
+
+      code {
+        color: var(--neon-pink);
+        background: transparent;
+        padding: 0;
+      }
+    }
+  }
+
+  // 3. STACK — feature grid ------------------------------------------------
+  section.landing-stack {
+    background:
+      radial-gradient(ellipse at 100% 0%, rgba(255, 41, 117, 0.08), transparent 55%),
+      var(--bg-void);
+    border-top: 1px solid var(--border-dim);
+
+    .stack-grid {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 1080px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .stack-tile {
+      position: relative;
+      padding: 1.75rem 1.5rem 1.5rem;
+      background: linear-gradient(160deg, rgba(28, 17, 69, 0.85) 0%, rgba(18, 10, 46, 0.85) 100%);
+      border: 1px solid var(--border-dim);
+      border-radius: 3px;
+      transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+    }
+
+    .stack-tile::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 2.5rem;
+      height: 1px;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.7);
+    }
+
+    .stack-tile:nth-child(even)::before {
+      background: var(--neon-pink);
+      box-shadow: 0 0 8px rgba(255, 41, 117, 0.7);
+    }
+
+    .stack-tile:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 240, 255, 0.55);
+      box-shadow:
+        0 0 0 1px rgba(0, 240, 255, 0.15),
+        0 0 32px -8px rgba(0, 240, 255, 0.5);
+    }
+
+    .stack-glyph {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+      margin-bottom: 0.75rem;
+      line-height: 1;
+    }
+    .stack-tile:nth-child(even) .stack-glyph {
+      color: var(--neon-pink);
+      text-shadow: var(--glow-pink);
+    }
+
+    .stack-name {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .stack-desc {
+      font-family: var(--font-body);
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 0 0 1rem 0;
+
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.85em;
+        color: var(--neon-yellow);
+        background: transparent;
+        border: none;
+        padding: 0;
+      }
+    }
+
+    .stack-link {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      color: var(--neon-pink);
+      text-decoration: none;
+      text-transform: lowercase;
+
+      &:hover {
+        color: #ff5d97;
+        text-shadow: var(--glow-pink);
+      }
+    }
+  }
+
+  // 4. PHILOSOPHY ----------------------------------------------------------
+  section.landing-philosophy {
+    padding: 9rem 1.5rem;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(185, 103, 255, 0.12), transparent 60%),
+      var(--bg-void);
+    text-align: center;
+
+    .convictions {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 1000px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .conviction {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 4.2vw, 3.2rem);
+      letter-spacing: 0.06em;
+      line-height: 1.25;
+      color: var(--text-primary);
+      padding: 1.5rem 0;
+      position: relative;
+    }
+
+    .conviction--1 {
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+    }
+    .conviction--2 {
+      color: var(--text-primary);
+      text-shadow:
+        0 0 6px rgba(255, 255, 255, 0.4),
+        0 0 18px rgba(185, 103, 255, 0.5);
+    }
+    .conviction--3 {
+      color: var(--neon-pink);
+      text-shadow: var(--glow-pink);
+    }
+
+    .conviction + .conviction::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--neon-pink) 30%,
+        var(--neon-cyan) 70%,
+        transparent 100%
+      );
+      opacity: 0.55;
+    }
+  }
+
+  // 5. QUICKSTART LADDER ---------------------------------------------------
+  section.landing-quickstart {
+    background:
+      radial-gradient(ellipse at 0% 100%, rgba(0, 240, 255, 0.08), transparent 55%),
+      var(--bg-void);
+    border-top: 1px solid var(--border-dim);
+
+    .quickstart-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 880px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .quickstart-step {
+      position: relative;
+      display: grid;
+      grid-template-columns: 5rem 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .quickstart-numeral {
+      font-family: var(--font-display);
+      font-size: 4.2rem;
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--neon-pink);
+      text-stroke: 1px var(--neon-pink);
+      opacity: 0.7;
+      text-shadow: 0 0 18px rgba(255, 41, 117, 0.25);
+      letter-spacing: 0.04em;
+      text-align: right;
+      user-select: none;
+    }
+
+    .quickstart-step:nth-child(2) .quickstart-numeral {
+      -webkit-text-stroke-color: var(--neon-cyan);
+      text-stroke-color: var(--neon-cyan);
+      text-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
+    }
+    .quickstart-step:nth-child(3) .quickstart-numeral {
+      -webkit-text-stroke-color: var(--neon-purple);
+      text-stroke-color: var(--neon-purple);
+      text-shadow: 0 0 18px rgba(185, 103, 255, 0.3);
+    }
+
+    .quickstart-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      left: 2.4rem;
+      top: calc(100% - 0.5rem);
+      width: 1px;
+      height: 2rem;
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--neon-cyan) 0,
+        var(--neon-cyan) 4px,
+        transparent 4px,
+        transparent 8px
+      );
+      opacity: 0.5;
+    }
+
+    .terminal-window--small {
+      .terminal-body { padding: 1rem 1.25rem; }
+      .tui--cmd     { font-size: 0.92rem; }
+    }
+
+    .tui--cmd .tui-prompt {
+      color: var(--neon-purple);
+      margin-right: 0.5rem;
+    }
+
+    .quickstart-note {
+      grid-column: 2;
+      margin: 0.5rem 0 0 0;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      color: var(--text-muted);
+
+      code {
+        font-family: var(--font-mono);
+        color: var(--neon-yellow);
+        background: transparent;
+        border: none;
+        padding: 0 0.2em;
+      }
+    }
+  }
+
+  // 6. FINAL CTA + FOOTER --------------------------------------------------
+  section.landing-cta {
+    padding: 7rem 1.5rem 3rem;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at 50% 100%, rgba(255, 41, 117, 0.14), transparent 60%),
+      var(--bg-void);
+    border-top: 1px solid var(--border-dim);
+
+    .cta-mark {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.2;
+      color: var(--neon-pink);
+      opacity: 0.32;
+      margin: 0 auto 2rem;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 12px rgba(255, 41, 117, 0.4);
+      display: inline-block;
+      text-align: center;
+      white-space: pre;
+    }
+
+    .cta-heading {
+      font-family: var(--font-heading);
+      font-size: clamp(1.5rem, 3.6vw, 2.4rem);
+      letter-spacing: 0.06em;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+      margin: 0 0 2rem 0;
+    }
+
+    .cta-actions {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 4rem;
+
+      .btn {
+        display: inline-block;
+        margin: 0 0.4rem;
+        padding: 0.75rem 1.6rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    .landing-footer {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.65rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-dim);
+      max-width: 700px;
+      margin: 0 auto;
+
+      a {
+        color: var(--text-muted);
+
+        &:hover {
+          color: var(--neon-pink);
+          text-shadow: var(--glow-pink);
+        }
+      }
+    }
+  }
+}
+
 // ----------------------------------------------------------------------------
 // Reduced motion
 // ----------------------------------------------------------------------------
@@ -451,8 +1059,14 @@ strong, b {
 }
 
 // ----------------------------------------------------------------------------
-// Small-screen hero adjustments
+// Responsive
 // ----------------------------------------------------------------------------
+
+@media (max-width: 900px) {
+  .landing-page section.landing-stack .stack-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
 @media (max-width: 640px) {
   .landing-hero {
@@ -462,5 +1076,43 @@ strong, b {
     display: block;
     margin: 0.5rem auto;
     max-width: 240px;
+  }
+
+  .landing-page {
+    section.landing-showcase,
+    section.landing-stack,
+    section.landing-philosophy,
+    section.landing-quickstart,
+    section.landing-cta {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .install-cmd   { font-size: 0.92rem; }
+    .install-glyph { font-size: 0.92rem; }
+
+    section.landing-showcase {
+      .terminal-body { padding: 0.85rem 0.9rem; }
+      .terminal-body pre.tui { font-size: 0.7rem; }
+    }
+
+    section.landing-stack .stack-grid {
+      grid-template-columns: 1fr;
+    }
+
+    section.landing-quickstart {
+      .quickstart-step {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .quickstart-numeral {
+        text-align: left;
+        font-size: 3rem;
+      }
+      .quickstart-step:not(:last-child)::after {
+        display: none;
+      }
+      .quickstart-note { grid-column: 1; }
+    }
   }
 }

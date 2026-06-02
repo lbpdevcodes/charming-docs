@@ -9,7 +9,7 @@ permalink: /docs/testing/
 
 Charming is designed to be tested without a real terminal. Use controller, template, view, and component specs for small units, and use `MemoryBackend` for runtime-level behavior.
 
-For app structure and rendering concepts, see [Core Concepts]({{ '/docs/core-concepts/' | relative_url }}), [Controllers & Templates]({{ '/docs/controllers-and-views/' | relative_url }}), and [Layouts]({{ '/docs/layouts/' | relative_url }}).
+For app structure and rendering concepts, see [Core Concepts]({{ '/docs/core-concepts/' | relative_url }}), [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }}), and [Layouts]({{ '/docs/layouts/' | relative_url }}).
 
 ## Generated Specs
 

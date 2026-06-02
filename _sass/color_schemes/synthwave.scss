@@ -37,3 +37,7 @@ $border-color:               $sw-border-dim;
 
 // Pygments highlight theme — github-dark looks fine against our bg-elevated.
 @import "./vendor/accessible-pygments/github-dark";
+
+.highlight {
+  // padding: 0 !important;
+}

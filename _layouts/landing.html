@@ -3,13 +3,214 @@
 {% include head.html %}
 <body class="landing-page">
   <main class="landing-main">
+
     <section class="landing-hero">
       <div class="synth-stars" aria-hidden="true"></div>
       <div class="hero-content">
         <h1>{% include logo.html class="landing-logo" %}</h1>
         {{ content }}
+
+        <div class="install-prompt" role="group" aria-label="Install command">
+          <span class="install-glyph" aria-hidden="true">$</span>
+          <code class="install-cmd" id="install-cmd">gem install charming</code>
+          <button class="install-copy" type="button" data-copy-target="install-cmd" aria-label="Copy install command">
+            <svg class="install-copy-icon" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" focusable="false">
+              <path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M5.5 4.5h7v9h-7z"/>
+              <path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M3.5 11.5V2.5h7"/>
+            </svg>
+            <span class="install-copy-label" data-copy-default="copy" data-copy-done="copied">copy</span>
+          </button>
+        </div>
       </div>
     </section>
+
+    <section class="landing-showcase" aria-labelledby="showcase-heading">
+      <header class="section-header">
+        <span class="section-kicker">// live demo</span>
+        <h2 id="showcase-heading">What Charming renders</h2>
+      </header>
+
+      <figure class="showcase-frame">
+        <img src="{{ '/assets/images/hn-screenshot.webp' | relative_url }}"
+             alt="A Charming TUI app rendering a Hacker News reader in the terminal"
+             class="showcase-image"
+             loading="lazy"
+             decoding="async">
+      </figure>
+
+      <p class="showcase-caption">&uarr; a real <code>charming</code> app, rendered in your terminal.</p>
+    </section>
+
+    <section class="landing-stack" aria-labelledby="stack-heading">
+      <header class="section-header">
+        <span class="section-kicker">// the stack</span>
+        <h2 id="stack-heading">Rails primitives, terminal-native</h2>
+      </header>
+
+      <ul class="stack-grid">
+        <li class="stack-tile">
+          <span class="stack-glyph" aria-hidden="true">/</span>
+          <h3 class="stack-name">Routing</h3>
+          <p class="stack-desc">Familiar <code>routes.rb</code> &mdash; <code>root</code> and <code>screen</code> map paths to controller actions.</p>
+          <a class="stack-link" href="{{ '/docs/routing/' | relative_url }}">routes.rb &rarr;</a>
+        </li>
+        <li class="stack-tile">
+          <span class="stack-glyph" aria-hidden="true">&gt;</span>
+          <h3 class="stack-name">Controllers</h3>
+          <p class="stack-desc">Actions render views by symbol. Key bindings declared at the class level.</p>
+          <a class="stack-link" href="{{ '/docs/controllers-and-views/' | relative_url }}">controllers &rarr;</a>
+        </li>
+        <li class="stack-tile">
+          <span class="stack-glyph" aria-hidden="true">[ ]</span>
+          <h3 class="stack-name">Components</h3>
+          <p class="stack-desc">Reusable widgets &mdash; static renderables or interactive, with their own key &amp; mouse handlers.</p>
+          <a class="stack-link" href="{{ '/docs/components/' | relative_url }}">components &rarr;</a>
+        </li>
+        <li class="stack-tile">
+          <span class="stack-glyph" aria-hidden="true">&#x25CE;</span>
+          <h3 class="stack-name">State</h3>
+          <p class="stack-desc">Durable in-memory state with typed attributes &mdash; survives between controller dispatches.</p>
+          <a class="stack-link" href="{{ '/docs/state/' | relative_url }}">state &rarr;</a>
+        </li>
+        <li class="stack-tile">
+          <span class="stack-glyph" aria-hidden="true">&#x2261;</span>
+          <h3 class="stack-name">Database</h3>
+          <p class="stack-desc">Persistence when you need it. Skip it when you don't.</p>
+          <a class="stack-link" href="{{ '/docs/database/' | relative_url }}">database &rarr;</a>
+        </li>
+        <li class="stack-tile">
+          <span class="stack-glyph" aria-hidden="true">&#x2713;</span>
+          <h3 class="stack-name">Testing</h3>
+          <p class="stack-desc">RSpec patterns for controllers, templates, components, timers, and the runtime.</p>
+          <a class="stack-link" href="{{ '/docs/testing/' | relative_url }}">testing &rarr;</a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="landing-philosophy" aria-labelledby="philosophy-heading">
+      <h2 id="philosophy-heading" class="visually-hidden">Philosophy</h2>
+      <ul class="convictions">
+        <li class="conviction conviction--1">Convention over configuration.</li>
+        <li class="conviction conviction--2">Rails, in your terminal.</li>
+        <li class="conviction conviction--3">No Electron. No browser. No bullshit.</li>
+      </ul>
+    </section>
+
+    <section class="landing-quickstart" aria-labelledby="quickstart-heading">
+      <header class="section-header">
+        <span class="section-kicker">// three commands</span>
+        <h2 id="quickstart-heading">From zero to running</h2>
+      </header>
+
+      <ol class="quickstart-list">
+        <li class="quickstart-step">
+          <span class="quickstart-numeral" aria-hidden="true">01</span>
+          <div class="terminal-window terminal-window--small">
+            <div class="terminal-titlebar">
+              <span class="terminal-dot terminal-dot--pink"></span>
+              <span class="terminal-dot terminal-dot--yellow"></span>
+              <span class="terminal-dot terminal-dot--cyan"></span>
+              <span class="terminal-title">install</span>
+            </div>
+            <div class="terminal-body">
+              <pre class="tui tui--cmd"><span class="tui-prompt">~</span> gem install charming</pre>
+            </div>
+          </div>
+          <p class="quickstart-note">Install the CLI gem on your machine.</p>
+        </li>
+
+        <li class="quickstart-step">
+          <span class="quickstart-numeral" aria-hidden="true">02</span>
+          <div class="terminal-window terminal-window--small">
+            <div class="terminal-titlebar">
+              <span class="terminal-dot terminal-dot--pink"></span>
+              <span class="terminal-dot terminal-dot--yellow"></span>
+              <span class="terminal-dot terminal-dot--cyan"></span>
+              <span class="terminal-title">generate</span>
+            </div>
+            <div class="terminal-body">
+              <pre class="tui tui--cmd"><span class="tui-prompt">~</span> charming new my_app
+<span class="tui-prompt">~</span> cd my_app &amp;&amp; bundle install</pre>
+            </div>
+          </div>
+          <p class="quickstart-note">Scaffold a Rails-shaped app with controllers, views, state.</p>
+        </li>
+
+        <li class="quickstart-step">
+          <span class="quickstart-numeral" aria-hidden="true">03</span>
+          <div class="terminal-window terminal-window--small">
+            <div class="terminal-titlebar">
+              <span class="terminal-dot terminal-dot--pink"></span>
+              <span class="terminal-dot terminal-dot--yellow"></span>
+              <span class="terminal-dot terminal-dot--cyan"></span>
+              <span class="terminal-title">run</span>
+            </div>
+            <div class="terminal-body">
+              <pre class="tui tui--cmd"><span class="tui-prompt">my_app</span> bundle exec exe/my_app</pre>
+            </div>
+          </div>
+          <p class="quickstart-note">Boots the TUI in your current terminal. Press <code>q</code> to quit.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="landing-cta" aria-labelledby="cta-heading">
+      <pre class="cta-mark" aria-hidden="true">
+ ╔═══════════════════════╗
+ ║   C  H  A  R  M  I  N  G   ║
+ ╚═══════════════════════╝</pre>
+      <h2 id="cta-heading" class="cta-heading">Build it in your terminal.</h2>
+      <div class="cta-actions">
+        <a href="{{ '/docs/' | relative_url }}" class="btn btn-primary">Read the Docs</a>
+        <a href="https://github.com/pandorocks/charming" class="btn" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <footer class="landing-footer">
+        <span>&copy; {{ "now" | date: "%Y" }} Charming</span>
+        <span aria-hidden="true">·</span>
+        <a href="https://github.com/pandorocks/charming/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://github.com/pandorocks/charming" target="_blank" rel="noopener noreferrer">github.com/pandorocks/charming</a>
+      </footer>
+    </section>
+
   </main>
+
+  <script>
+    (function () {
+      var buttons = document.querySelectorAll('.install-copy[data-copy-target]');
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var target = document.getElementById(btn.getAttribute('data-copy-target'));
+          if (!target) return;
+          var text = target.textContent.trim();
+          var label = btn.querySelector('.install-copy-label');
+          var done = label.getAttribute('data-copy-done');
+          var def = label.getAttribute('data-copy-default');
+          var commit = function () {
+            label.textContent = done;
+            btn.classList.add('is-copied');
+            setTimeout(function () {
+              label.textContent = def;
+              btn.classList.remove('is-copied');
+            }, 1400);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(commit, function () { commit(); });
+          } else {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'absolute';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+            commit();
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

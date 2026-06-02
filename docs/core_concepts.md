@@ -111,7 +111,7 @@ That resolves:
 app/views/layouts/application_layout.rb
 ```
 
-ERB templates remain available as a fallback. See [Controllers & Templates]({{ '/docs/controllers-and-views/' | relative_url }}) and [Layouts]({{ '/docs/layouts/' | relative_url }}) for details.
+ERB templates remain available as a fallback. See [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }}) and [Layouts]({{ '/docs/layouts/' | relative_url }}) for details.
 
 ## Runtime
 
