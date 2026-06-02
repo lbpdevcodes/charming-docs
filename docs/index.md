@@ -3,42 +3,52 @@ title: Docs
 layout: default
 nav_order: 1
 permalink: /docs/
+has_children: true
 ---
+# Charming Documentation
 
-This is a *bare-minimum* template to create a Jekyll site that uses the [Just the Docs] theme. You can easily set the created site to be published on [GitHub Pages] – the [README] file explains how to do that, along with other details.
+Use this index to navigate the Charming docs by what you are trying to do.
 
-If [Jekyll] is installed on your computer, you can also build and preview the created site *locally*. This lets you test changes before committing them, and avoids waiting for GitHub Pages.[^1] And you will be able to deploy your local build to a different platform than GitHub Pages.
+## Reading Paths
 
-More specifically, the created site:
+New users:
 
-- uses a gem-based approach, i.e. uses a `Gemfile` and loads the `just-the-docs` gem
-- uses the [GitHub Pages / Actions workflow] to build and publish the site on GitHub Pages
+1. [Getting Started]({{ '/docs/getting-started/' | relative_url }})
+2. [Core Concepts]({{ '/docs/core-concepts/' | relative_url }})
+3. [Layouts]({{ '/docs/layouts/' | relative_url }})
 
-Other than that, you're free to customize sites that you create with this template, however you like. You can easily change the versions of `just-the-docs` and Jekyll it uses, as well as adding further plugins.
+App builders:
 
-[Browse our documentation][Just the Docs] to learn more about how to use this theme.
+1. [Routing]({{ '/docs/routing/' | relative_url }})
+2. [Controllers & Templates]({{ '/docs/controllers-and-views/' | relative_url }})
+3. [State]({{ '/docs/state/' | relative_url }})
+4. [Database]({{ '/docs/database/' | relative_url }})
 
-To get started with creating a site, simply:
+UI builders:
 
-1. click "[use this template]" to create a GitHub repository
-2. go to Settings > Pages > Build and deployment > Source, and select GitHub Actions
+1. [Layouts]({{ '/docs/layouts/' | relative_url }})
+2. [Components]({{ '/docs/components/' | relative_url }})
+3. [Themes]({{ '/docs/themes/' | relative_url }})
 
-If you want to maintain your docs in the `docs` directory of an existing project repo, see [Hosting your docs from an existing project repo](https://github.com/just-the-docs/just-the-docs-template/blob/main/README.md#hosting-your-docs-from-an-existing-project-repo) in the template README.
+Maintainers:
 
-----
+1. [API Reference]({{ '/docs/api/' | relative_url }})
+2. [Testing]({{ '/docs/testing/' | relative_url }})
 
-```ruby
+## Guides
 
-def syntax_highlighting
-  puts "Works!"
-end
-```
+| Guide | Purpose |
+|-------|---------|
+| [Getting Started]({{ '/docs/getting-started/' | relative_url }}) | Build and run a generated Charming app. |
+| [Core Concepts]({{ '/docs/core-concepts/' | relative_url }}) | App architecture, runtime flow, ephemeral controllers, and state. |
+| [Routing]({{ '/docs/routing/' | relative_url }}) | `root`, `screen`, dynamic params, route titles, and route order. |
+| [Controllers & Templates]({{ '/docs/controllers-and-views/' | relative_url }}) | Actions, `render :show`, `render_template`, key bindings, commands, timers, and tasks. |
+| [Layouts]({{ '/docs/layouts/' | relative_url }}) | Template layouts, `yield_content`, split panes, overlays, responsive layouts, and styles. |
+| [State]({{ '/docs/state/' | relative_url }}) | `ApplicationState`, typed attributes, validations, and session-backed state. |
+| [Database]({{ '/docs/database/' | relative_url }}) | Optional SQLite persistence with Active Record models and migrations. |
+| [Components]({{ '/docs/components/' | relative_url }}) | Built-in components, custom components, and interaction return values. |
+| [Themes]({{ '/docs/themes/' | relative_url }}) | Theme registration, tokens, and runtime theme switching. |
+| [API Reference]({{ '/docs/api/' | relative_url }}) | Compact public API reference. |
+| [Testing]({{ '/docs/testing/' | relative_url }}) | Controller, template, component, runtime, timer, and task tests. |
 
-[^1]: [It can take up to 10 minutes for changes to your site to publish after you push the changes to GitHub](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll#creating-your-site).
-
-[Just the Docs]: https://just-the-docs.github.io/just-the-docs/
-[GitHub Pages]: https://docs.github.com/en/pages
-[README]: https://github.com/just-the-docs/just-the-docs-template/blob/main/README.md
-[Jekyll]: https://jekyllrb.com
-[GitHub Pages / Actions workflow]: https://github.blog/changelog/2022-07-27-github-pages-custom-github-actions-workflows-beta/
-[use this template]: https://github.com/just-the-docs/just-the-docs-template/generate
+These docs contain detailed explanations and examples for Charming.
