@@ -411,6 +411,77 @@ strong, b {
   font-family: var(--font-heading);
 }
 
+.landing-page .hero-content .hero-alert {
+  position: relative;
+  z-index: 30;
+  display: block;
+  box-sizing: border-box;
+  width: clamp(320px, 86%, 760px);
+  margin: 2.25rem auto 0;
+  padding: 1rem 1.1rem 1rem 2.25rem;
+  background: #000;
+  border: 1px solid var(--neon-yellow);
+  border-left: 0;
+  text-align: left;
+}
+
+.landing-page .hero-content .hero-alert__rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 14px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--neon-yellow) 0,
+    var(--neon-yellow) 8px,
+    #000 8px,
+    #000 16px
+  );
+}
+
+.landing-page .hero-content .hero-alert__tab {
+  position: absolute;
+  top: -13px;
+  left: -1px;
+  display: inline-block;
+  padding: 0.22rem 0.6rem;
+  background: var(--neon-yellow);
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.landing-page .hero-content .hero-alert__body {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1.05vw, 0.82rem);
+  line-height: 1.55;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.86);
+  text-transform: uppercase;
+}
+
+.landing-page .hero-content .hero-alert__line {
+  display: block;
+}
+
+.landing-page .hero-content .hero-alert__cursor {
+  display: inline-block;
+  margin-left: 0.18em;
+  color: var(--neon-yellow);
+  animation: hero-alert-blink 1.05s steps(2, end) infinite;
+}
+
+@keyframes hero-alert-blink {
+  50% { opacity: 0; }
+}
+
 // Hero scanlines — applied only to the hero section so docs stay clean.
 .landing-hero::after {
   content: "";

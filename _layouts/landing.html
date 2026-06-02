@@ -10,6 +10,15 @@
         <h1>{% include logo.html class="landing-logo" %}</h1>
         {{ content }}
 
+        <aside class="hero-alert" role="note" aria-label="Pre-release notice">
+          <span class="hero-alert__rail" aria-hidden="true"></span>
+          <span class="hero-alert__tab">[ ! ] PRE-RELEASE // UNSTABLE</span>
+          <p class="hero-alert__body">
+            <span class="hero-alert__line">STATUS: ALPHA &mdash; APIs, BEHAVIOR, AND GENERATED APP STRUCTURE MAY CHANGE.</span>
+            <span class="hero-alert__line">EXPECT BREAKING CHANGES WHEN UPDATING UNTIL THE STABLE RELEASE.<span class="hero-alert__cursor" aria-hidden="true">&#x258D;</span></span>
+          </p>
+        </aside>
+
         <div class="install-prompt" role="group" aria-label="Install command">
           <span class="install-glyph" aria-hidden="true">$</span>
           <code class="install-cmd" id="install-cmd">gem install charming</code>
