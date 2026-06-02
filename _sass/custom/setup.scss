@@ -1,0 +1,13 @@
+// Loaded BEFORE the theme's color scheme + modules. Override !default
+// typography vars here so the compiled theme picks up our fonts everywhere.
+
+$body-font-family: "Chakra Petch", system-ui, -apple-system, "Segoe UI",
+  sans-serif;
+$mono-font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", menlo,
+  consolas, monospace;
+
+$body-line-height: 1.55;
+$content-line-height: 1.7;
+$body-heading-line-height: 1.2;
+
+$border-radius: 2px;

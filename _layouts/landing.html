@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+{% include head.html %}
+<body class="landing-page">
+  <main class="landing-main">
+    <section class="landing-hero">
+      <div class="synth-stars" aria-hidden="true"></div>
+      <div class="hero-content">
+        <h1>{% include logo.html class="landing-logo" %}</h1>
+        {{ content }}
+      </div>
+    </section>
+  </main>
+</body>
+</html>

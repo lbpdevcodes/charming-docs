@@ -1,0 +1,39 @@
+// Synthwave / Miami Vice color scheme for Just the Docs.
+// Loaded after color_schemes/light.scss, so these win.
+
+$color-scheme: dark;
+
+// Palette ---------------------------------------------------------------
+$sw-bg-void:      #07061a;
+$sw-bg-deep:      #120a2e;
+$sw-bg-elevated:  #1c1145;
+$sw-border-dim:   #2a1a5e;
+
+$sw-neon-pink:    #ff2975;
+$sw-neon-cyan:    #00f0ff;
+$sw-neon-purple:  #b967ff;
+$sw-neon-yellow:  #ffd319;
+$sw-neon-orange:  #ff901f;
+
+$sw-text-primary: #f4f4ff;
+$sw-text-muted:   #a890d4;
+
+// Just the Docs variable overrides --------------------------------------
+$body-background-color:      $sw-bg-deep;
+$body-heading-color:         $sw-neon-cyan;
+$body-text-color:            $sw-text-primary;
+$link-color:                 $sw-neon-pink;
+$nav-child-link-color:       $sw-text-muted;
+$sidebar-color:              $sw-bg-void;
+$base-button-color:          $sw-bg-elevated;
+$btn-primary-color:          $sw-neon-pink;
+$code-background-color:      $sw-bg-elevated;
+$code-linenumber-color:      $sw-text-muted;
+$feedback-color:             darken($sw-bg-void, 2%);
+$table-background-color:     $sw-bg-elevated;
+$search-background-color:    $sw-bg-elevated;
+$search-result-preview-color: $sw-text-muted;
+$border-color:               $sw-border-dim;
+
+// Pygments highlight theme — github-dark looks fine against our bg-elevated.
+@import "./vendor/accessible-pygments/github-dark";
