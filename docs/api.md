@@ -1,7 +1,7 @@
 ---
 title: API Reference
 layout: default
-nav_order: 11
+nav_order: 12
 parent: Docs
 permalink: /docs/api/
 ---
@@ -44,6 +44,7 @@ end
 Class APIs:
 
 - `routes { ... }` defines routes with the router DSL.
+- `logger value` sets the application logger. The default logger writes to `File::NULL`.
 - `root path` sets the application root path used for resolving relative files and templates.
 - `theme name, built_in: "phosphor"` registers a built-in JSON theme.
 - `theme name, from: "config/themes/custom.json"` registers an app-local theme file.
@@ -54,6 +55,8 @@ Class APIs:
 Instance APIs:
 
 - `routes` returns the app router.
+- `logger` returns the application logger.
+- `logger=` overrides the logger for this application instance.
 - `session` returns persistent app session state.
 - `theme` returns the active theme.
 - `use_theme name` switches the active theme.
@@ -124,6 +127,7 @@ Instance APIs:
 - `navigate_to(path)` produces a navigation response.
 - `quit` produces a quit response.
 - `session` accesses the application session.
+- `logger` returns the application logger.
 - `state(name, state_class, **attributes)` stores or returns a session-backed state object.
 - `run_task(name) { ... }` submits async work.
 - `params` exposes current route params.

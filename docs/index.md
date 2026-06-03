@@ -23,6 +23,7 @@ App builders:
 2. [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }})
 3. [State]({{ '/docs/state/' | relative_url }})
 4. [Database]({{ '/docs/database/' | relative_url }})
+5. [Logging]({{ '/docs/logging/' | relative_url }})
 
 UI builders:
 
@@ -32,8 +33,9 @@ UI builders:
 
 Maintainers:
 
-1. [API Reference]({{ '/docs/api/' | relative_url }})
-2. [Testing]({{ '/docs/testing/' | relative_url }})
+1. [Logging]({{ '/docs/logging/' | relative_url }})
+2. [API Reference]({{ '/docs/api/' | relative_url }})
+3. [Testing]({{ '/docs/testing/' | relative_url }})
 
 ## Guides
 
@@ -48,6 +50,7 @@ Maintainers:
 | [Database]({{ '/docs/database/' | relative_url }}) | Optional SQLite persistence with Active Record models and migrations. |
 | [Components]({{ '/docs/components/' | relative_url }}) | Built-in components, custom components, and interaction return values. |
 | [Themes]({{ '/docs/themes/' | relative_url }}) | Theme registration, tokens, and runtime theme switching. |
+| [Logging]({{ '/docs/logging/' | relative_url }}) | Application and controller logging without corrupting TUI output. |
 | [API Reference]({{ '/docs/api/' | relative_url }}) | Compact public API reference. |
 | [Testing]({{ '/docs/testing/' | relative_url }}) | Controller, template, component, runtime, timer, and task tests. |
 
