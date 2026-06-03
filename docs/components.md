@@ -50,7 +50,7 @@ Assigns passed to `new` become reader methods:
 | `Modal` | Overlay dialog with title, content, and help text. |
 | `CommandPaletteModal` | Standard modal wrapper for command palette content. |
 | `CommandPalette` | Fuzzy-search command input used internally by the framework. |
-| `Markdown` | Markdown renderer backed by Kramdown with Rouge syntax highlighting for code blocks. |
+| `Markdown` | CommonMark/GFM renderer backed by Commonmarker with Rouge syntax highlighting for code blocks. |
 | `Viewport` | Scrollable container for tall content lists. |
 | `Spinner` | Animated progress indicator. |
 | `ActivityIndicator` | Spinner-style activity indicator. |
@@ -77,17 +77,29 @@ Render Markdown with `Charming::Components::Markdown`:
 <%= render_component Charming::Components::Markdown.new(
   content: readme,
   width: 72,
-  theme: theme
+  theme: theme,
+  style: :dark
 ) %>
 ```
 
-Markdown parsing is handled by Kramdown. Code block tokenization is handled by Rouge. Charming owns the terminal rendering, wrapping, and theme styling.
+Markdown parsing is handled by Commonmarker with CommonMark/GFM support. Code block tokenization is handled by Rouge. Charming owns terminal rendering, wrapping, and Glamour-inspired Markdown styling.
+
+The built-in Markdown styles are `:dark`, `:light`, and `:notty`. GFM tables, task lists, strikethrough, autolinks, links, and images render as terminal-friendly text. Relative links and image targets can be resolved with `base_url:`:
+
+```erb
+<%= render_component Charming::Components::Markdown.new(
+  content: readme,
+  width: 72,
+  style: :dark,
+  base_url: "https://example.com/docs/"
+) %>
+```
 
 Use it with `Viewport` for scrollable documentation or help screens:
 
 ```erb
 <%= render_component Charming::Components::Viewport.new(
-  content: Charming::Components::Markdown.new(content: readme, width: 72, theme: theme),
+  content: Charming::Components::Markdown.new(content: readme, width: 72, theme: theme, style: :dark),
   width: 72,
   height: 20
 ) %>

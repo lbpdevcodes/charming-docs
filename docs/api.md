@@ -356,8 +356,10 @@ Markdown component constructor:
 - `width:` optional terminal width used for paragraph wrapping.
 - `theme:` optional `Charming::UI::Theme`.
 - `syntax_highlighting:` controls Rouge-backed code block highlighting, defaulting to `true`.
+- `style:` Markdown style name or style config, defaulting to `:dark`. Built-in styles are `:dark`, `:light`, and `:notty`.
+- `base_url:` optional base URL used to resolve relative links and image targets.
 
-Markdown parsing uses Kramdown. Syntax highlighting uses Rouge. Charming maps parsed nodes and Rouge tokens to terminal text through `Charming::UI::Style` and theme tokens.
+Markdown parsing uses Commonmarker with CommonMark/GFM support. Syntax highlighting uses Rouge. Charming maps parsed nodes and Rouge tokens to terminal text through a Glamour-inspired Markdown style config and ANSI theme styling. Supported GFM rendering includes tables, task lists, strikethrough, autolinks, links, and terminal-friendly image labels.
 
 ## UI
 
