@@ -6,7 +6,7 @@ nav_exclude: true
 search_exclude: true
 ---
 
-A Rails inspired Ruby TUI framework.
+A Rails-inspired Ruby *TUI* framework.
 
-[Read the Docs]({{ '/docs/' | relative_url }}){: .btn .btn-primary }
-[GitHub](https://github.com/pandorocks/charming){: .btn target="_blank" rel="noopener noreferrer" }
+[docs &#8599;]({{ '/docs/' | relative_url }}){: .btn .btn-primary }
+[github &#8599;](https://github.com/pandorocks/charming){: .btn target="_blank" rel="noopener noreferrer" }
