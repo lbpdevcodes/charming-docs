@@ -28,12 +28,12 @@ ERB layouts remain available as a fallback with `layout "layouts/application"`.
 
 ## Layout Class
 
-Layout classes inherit from `Charming::Presentation::View`:
+Layout classes inherit from `Charming::View`:
 
 ```ruby
 module MyApp
   module Layouts
-    class ApplicationLayout < Charming::Presentation::View
+    class ApplicationLayout < Charming::View
       def render
         screen_layout(background: theme.background) do
           split :horizontal, gap: 1 do
@@ -121,7 +121,7 @@ Pane styling options:
 
 Pane dimensions are outer dimensions. Borders and padding are included in the assigned width and height.
 
-Pane blocks may accept a `Charming::Presentation::Layout::Rect` argument. The yielded rect is the pane's inner content area after border and padding are applied, so components can render to their actual available width and height:
+Pane blocks may accept a `Charming::Layout::Rect` argument. The yielded rect is the pane's inner content area after border and padding are applied, so components can render to their actual available width and height:
 
 ```ruby
 pane(:content, grow: 1, border: :rounded, padding: [1, 2]) do |rect|
@@ -149,7 +149,7 @@ Screens are Ruby view classes by default:
 ```ruby
 module MyApp
   module Home
-    class ShowView < Charming::Presentation::View
+    class ShowView < Charming::View
       def render
         column(
           text(home.title, style: theme.title),
@@ -223,7 +223,7 @@ private
 def command_palette_modal
   return unless palette
 
-  render_component Charming::Presentation::Components::CommandPaletteModal.new(
+  render_component Charming::Components::CommandPaletteModal.new(
     content: palette,
     theme: theme
   )
@@ -242,14 +242,14 @@ The DSL sits above the lower-level string helpers. Use these inside panes and sc
 | `column(*items, gap: 0)` | Stack blocks vertically. |
 | `render_component(component)` | Render reusable components. |
 
-Use `Charming::Presentation::UI.place`, `center`, and `overlay` only when you need lower-level canvas control.
+Use `Charming::UI.place`, `center`, and `overlay` only when you need lower-level canvas control.
 
 ## Style Chaining
 
-`Charming::Presentation::UI::Style` objects are immutable and chainable:
+`Charming::UI::Style` objects are immutable and chainable:
 
 ```ruby
-panel_style = Charming::Presentation::UI.style
+panel_style = Charming::UI.style
   .foreground(:bright_cyan)
   .background("#101820")
   .bold

@@ -57,7 +57,7 @@ render :show, home: home, palette: command_palette
 ```ruby
 module MyApp
   module Home
-    class ShowView < Charming::Presentation::View
+    class ShowView < Charming::View
       def render
         text home.title, style: theme.title
       end
@@ -174,7 +174,7 @@ Task results arrive as `Charming::Events::TaskEvent` with `value`, `error`, and 
 Generated apps use templates by default, but class-based views still work:
 
 ```ruby
-class HomeView < Charming::Presentation::View
+class HomeView < Charming::View
   def render
     text title, style: theme.title
   end

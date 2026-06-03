@@ -7,14 +7,14 @@ permalink: /docs/components/
 ---
 # Components
 
-Components are reusable UI objects. They inherit from `Charming::Presentation::Component`, which itself inherits from `Charming::Presentation::View`, so they get assigns and rendering helpers.
+Components are reusable UI objects. They inherit from `Charming::Component`, which itself inherits from `Charming::View`, so they get assigns and rendering helpers.
 
 ## Rendering Components
 
 Render components from templates or views with `render_component`:
 
 ```erb
-<%= render_component Charming::Presentation::Components::List.new(
+<%= render_component Charming::Components::List.new(
   items: ["Alpha", "Beta", "Gamma"],
   selected_index: 0,
   theme: theme
@@ -26,7 +26,7 @@ Render components from templates or views with `render_component`:
 Define a component by implementing `render`:
 
 ```ruby
-class CounterComponent < Charming::Presentation::Component
+class CounterComponent < Charming::Component
   def render
     text "Count: #{count}", style: theme.info
   end
@@ -61,7 +61,7 @@ Assigns passed to `new` become reader methods:
 `ActivityIndicator` accepts `max_width:` and `fallback_label:` to keep labeled loading indicators stable in constrained layouts:
 
 ```ruby
-render_component Charming::Presentation::Components::ActivityIndicator.new(
+render_component Charming::Components::ActivityIndicator.new(
   width: 24,
   label: "Loading Top Stories",
   max_width: content_width,
@@ -71,10 +71,10 @@ render_component Charming::Presentation::Components::ActivityIndicator.new(
 
 ## Markdown
 
-Render Markdown with `Charming::Presentation::Components::Markdown`:
+Render Markdown with `Charming::Components::Markdown`:
 
 ```erb
-<%= render_component Charming::Presentation::Components::Markdown.new(
+<%= render_component Charming::Components::Markdown.new(
   content: readme,
   width: 72,
   theme: theme
@@ -86,8 +86,8 @@ Markdown parsing is handled by Kramdown. Code block tokenization is handled by R
 Use it with `Viewport` for scrollable documentation or help screens:
 
 ```erb
-<%= render_component Charming::Presentation::Components::Viewport.new(
-  content: Charming::Presentation::Components::Markdown.new(content: readme, width: 72, theme: theme),
+<%= render_component Charming::Components::Viewport.new(
+  content: Charming::Components::Markdown.new(content: readme, width: 72, theme: theme),
   width: 72,
   height: 20
 ) %>
@@ -96,7 +96,7 @@ Use it with `Viewport` for scrollable documentation or help screens:
 Disable code syntax highlighting when plain code blocks are preferred:
 
 ```erb
-<%= render_component Charming::Presentation::Components::Markdown.new(
+<%= render_component Charming::Components::Markdown.new(
   content: readme,
   syntax_highlighting: false
 ) %>

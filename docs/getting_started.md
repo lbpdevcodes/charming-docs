@@ -114,7 +114,7 @@ Views are Ruby classes with access to assigns and view helpers:
 ```ruby
 module MyApp
   module Home
-    class ShowView < Charming::Presentation::View
+    class ShowView < Charming::View
       def render
         column(
           text(home.title, style: theme.title),
@@ -200,7 +200,7 @@ Generated apps register built-in themes and default to `:phosphor`:
 
 ```ruby
 class MyApp::Application < Charming::Application
-  Charming::Presentation::UI::Theme.built_in_names.each do |theme_name|
+  Charming::UI::Theme.built_in_names.each do |theme_name|
     theme theme_name.to_sym, built_in: theme_name
   end
 

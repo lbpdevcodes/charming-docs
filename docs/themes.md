@@ -15,7 +15,7 @@ Generated apps register all built-in themes and choose `:phosphor` by default:
 
 ```ruby
 class MyApp::Application < Charming::Application
-  Charming::Presentation::UI::Theme.built_in_names.each do |theme_name|
+  Charming::UI::Theme.built_in_names.each do |theme_name|
     theme theme_name.to_sym, built_in: theme_name
   end
 
@@ -38,7 +38,7 @@ Relative paths resolve from `Application.root` when set, otherwise from the curr
 
 ## Use Theme Tokens
 
-Theme tokens return `Charming::Presentation::UI::Style` objects:
+Theme tokens return `Charming::UI::Style` objects:
 
 ```ruby
 text "Welcome", style: theme.title
@@ -99,4 +99,4 @@ Theme JSON files contain a `styles` object and may contain a `palette` and `back
 }
 ```
 
-Style options mirror `Charming::Presentation::UI::Style` methods: foreground/background colors, text attributes, padding, border, width, height, and alignment.
+Style options mirror `Charming::UI::Style` methods: foreground/background colors, text attributes, padding, border, width, height, and alignment.
