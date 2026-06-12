@@ -122,7 +122,25 @@ Render Markdown with `Charming::Components::Markdown`:
 
 Markdown parsing is handled by Commonmarker with CommonMark/GFM support. Code block tokenization is handled by Rouge. Charming owns terminal rendering, wrapping, and Glamour-inspired Markdown styling.
 
-The built-in Markdown styles are `:dark`, `:light`, and `:notty`. GFM tables, task lists, strikethrough, autolinks, links, and images render as terminal-friendly text. Relative links and image targets can be resolved with `base_url:`:
+The built-in Markdown styles are `:dark`, `:light`, and `:notty`. GFM tables, task lists, strikethrough, autolinks, links, images, definition lists, and footnotes render as terminal-friendly text:
+
+- **Definition lists** (`Term` / `: definition`) render bold terms with indented, wrapped descriptions.
+- **Footnotes** render `[name]` references inline and labeled definition blocks with hanging indentation.
+- **Task lists** detect the checked state from the list marker only — prose mentioning `[x]` doesn't check a box.
+- **Raw HTML blocks** render as nothing by default (matching Glamour); a custom style config can set `html_block: {format: "..."}` to show a placeholder.
+
+Make links clickable in modern terminals with `hyperlinks: true` — links are wrapped
+in OSC 8 escapes and the ` <url>` suffix is dropped since the target is embedded.
+Off by default so test captures and older terminals stay clean:
+
+```erb
+<%= render_component Charming::Components::Markdown.new(
+  content: readme,
+  hyperlinks: true
+) %>
+```
+
+Relative links and image targets can be resolved with `base_url:`:
 
 ```erb
 <%= render_component Charming::Components::Markdown.new(
