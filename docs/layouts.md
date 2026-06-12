@@ -103,7 +103,14 @@ Pane sizing options:
 | `width: n` | Fixed outer width in a horizontal split. |
 | `height: n` | Fixed outer height in a vertical split. |
 | `grow: n` | Take remaining space, weighted by `n`. |
+| `min_width: n` / `max_width: n` | Clamp the computed width (horizontal splits). |
+| `min_height: n` / `max_height: n` | Clamp the computed height (vertical splits). |
 | no size | Equivalent to `grow: 1` inside a split. |
+
+Constraints apply after grow distribution: a clamped pane's surplus or deficit is
+re-balanced onto the remaining flexible children, so `pane(:sidebar, width: 24,
+min_width: 18)` keeps a usable sidebar on narrow terminals while `grow` panes absorb
+the difference.
 
 Pane styling options:
 
@@ -153,7 +160,7 @@ module MyApp
       def render
         column(
           text(home.title, style: theme.title),
-          text("Press p for commands, q to quit.", style: theme.muted),
+          text("Press ctrl+p for commands, q to quit.", style: theme.muted),
           gap: 1
         )
       end
@@ -227,6 +234,40 @@ def command_palette_modal
     content: palette,
     theme: theme
   )
+end
+```
+
+Overlays accept `z_index:` for stacking order — higher values composite on top, and
+ties keep registration order. Useful when a toast must float above an open modal:
+
+```ruby
+overlay help_modal, z_index: 5 if help_modal
+overlay toast, top: screen.height - 5, left: :center, z_index: 10 if toast
+```
+
+## Status Bar
+
+The classic bottom bar is a one-row pane wrapping the whole layout in an outer
+vertical split. (`status_hints` here is an app-defined controller method returning
+`[key, description]` pairs — each screen can override it.)
+
+```ruby
+screen_layout(background: theme.background) do
+  split :vertical do
+    split :horizontal, gap: 1, grow: 1 do
+      pane(:sidebar, width: 24, min_width: 18, border: :rounded) { navigation }
+      pane(:content, grow: 1, border: :rounded) { yield_content }
+    end
+
+    pane(:status_bar, height: 1) do
+      render_component Charming::Components::StatusBar.new(
+        width: screen.width,
+        left: " #{controller.route&.title}",
+        hints: controller.status_hints,
+        theme: theme
+      )
+    end
+  end
 end
 ```
 

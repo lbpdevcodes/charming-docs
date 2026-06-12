@@ -123,11 +123,36 @@ Charming.run(MyApp::Application.new)
 
 The runtime:
 
-1. Enters the terminal alternate screen
+1. Enters the terminal alternate screen and enables mouse tracking, bracketed paste, and focus reporting
 2. Resolves the root route
 3. Dispatches controller actions and events
 4. Renders responses through a renderer
-5. Reads key, mouse, resize, timer, and task events
+5. Reads key, mouse, paste, resize, timer, and task events
 6. Restores terminal state on quit or error
+
+### Key dispatch priority
+
+Key events are matched in order: command palette (when open) → printable characters
+to a focused text-capturing component → global key bindings → overlay focus scopes
+(modals) → sidebar keys → content key bindings → the focused component / Tab
+traversal. The practical upshot: typing into a field always types, shortcuts work
+everywhere else. Details in
+[Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }}).
+
+### Errors
+
+An unhandled exception from a controller action does not crash the terminal. The
+runtime logs the full backtrace to the application logger and renders a centered
+error panel showing the exception class, message, and top backtrace lines. Any key
+dismisses it and re-renders the current route; `q` quits. Handle expected errors
+yourself with `rescue_from` before they reach the runtime.
+
+### Quitting
+
+`q`-style bindings produce a quit `Response`. The runtime also traps SIGINT and
+treats an *unbound* `ctrl+c` keypress as quit, so apps always have an escape hatch —
+bind `"ctrl+c"` yourself to take it over. On the way out the runtime drains
+background tasks (with a grace period), persists the session when configured, and
+restores the terminal.
 
 For tests, instantiate `Charming::Runtime` directly with `MemoryBackend`. See [Testing]({{ '/docs/testing/' | relative_url }}).

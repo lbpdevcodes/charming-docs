@@ -79,7 +79,7 @@ Generated controllers render views by symbol:
 ```ruby
 module MyApp
   class HomeController < ApplicationController
-    key "p", :open_command_palette, scope: :global
+    key "ctrl+p", :open_command_palette, scope: :global
     key "q", :quit, scope: :global
 
     def show
@@ -118,7 +118,7 @@ module MyApp
       def render
         column(
           text(home.title, style: theme.title),
-          text("Press p for commands, q to quit.", style: theme.muted),
+          text("Press ctrl+p for commands, q to quit.", style: theme.muted),
           gap: 1
         )
       end
@@ -226,9 +226,28 @@ charming generate screen forecast
 charming generate controller forecast show
 charming generate view forecast show
 charming generate component forecast_card
+charming generate model city name:string            # database apps
+charming generate migration add_region_to_cities region:string
 ```
 
 `generate` can be shortened to `g`.
+
+## Console
+
+Open IRB with the app loaded (Zeitwerk autoloading active, database connected when
+configured), from the app root:
+
+```sh
+charming console     # or: charming c
+```
+
+```text
+Loading development environment (Charming 0.1.0)
+irb> app.routes.all
+irb> MyApp::City.count
+```
+
+`app` returns a memoized application instance.
 
 ## Run Tests
 
@@ -238,4 +257,14 @@ Generated apps include RSpec specs. Run them with:
 bundle exec rspec
 ```
 
+Database apps run their specs against an isolated `db/test.sqlite3` — the generated
+`spec/spec_helper.rb` pins `CHARMING_ENV=test`, loads the schema, and rolls back each
+example in a transaction.
+
 For controller, template, component, timer, task, and runtime testing patterns, see [Testing]({{ '/docs/testing/' | relative_url }}).
+
+## See A Complete App
+
+The framework repository ships a full demo at `examples/journal` — a Markdown
+journal exercising forms, hooks, async tasks with progress, modals, toasts, themes,
+and journey specs. See [Example App: Journal]({{ '/docs/example-app/' | relative_url }}).

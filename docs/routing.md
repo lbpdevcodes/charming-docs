@@ -25,7 +25,7 @@ end
 | `screen "/path", to: "controller#action"` | Maps a path to a controller action. |
 | `title:` | Sets a display title used by generated sidebar layouts. |
 
-Controller names are resolved inside the application namespace. In a generated `MyApp` app, `to: "home#show"` resolves to `MyApp::HomeController`.
+Controller names are resolved inside the application namespace. In a generated `MyApp` app, `to: "home#show"` resolves to `MyApp::HomeController`. When the `#action` part is omitted (`to: "home"`), the action defaults to `#show`.
 
 ## Dynamic Params
 
@@ -56,7 +56,16 @@ Params are symbol-keyed and URL-decoded.
 - Missing routes raise `KeyError`.
 - `application.routes.all` returns routes in insertion order.
 
-Generated layouts use `application.routes.all` to build sidebar navigation.
+Generated layouts use `application.routes.all` to build sidebar navigation, and
+sidebar rows respond to mouse clicks (a click on a route row navigates to it).
+Controllers can override `sidebar_routes` to filter the list — for example, to hide
+dynamic routes that only make sense with an id:
+
+```ruby
+def sidebar_routes
+  application.routes.all.reject { |route| route.path.include?(":") }
+end
+```
 
 ## Route Titles
 

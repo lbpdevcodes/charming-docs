@@ -16,6 +16,7 @@ New users:
 1. [Getting Started]({{ '/docs/getting-started/' | relative_url }})
 2. [Core Concepts]({{ '/docs/core-concepts/' | relative_url }})
 3. [Layouts]({{ '/docs/layouts/' | relative_url }})
+4. [Example App: Journal]({{ '/docs/example-app/' | relative_url }})
 
 App builders:
 
@@ -47,11 +48,12 @@ Maintainers:
 | [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }}) | Actions, `render :show`, `render_template`, key bindings, commands, timers, and tasks. |
 | [Layouts]({{ '/docs/layouts/' | relative_url }}) | Template layouts, `yield_content`, split panes, overlays, responsive layouts, and styles. |
 | [State]({{ '/docs/state/' | relative_url }}) | `ApplicationState`, typed attributes, validations, and session-backed state. |
-| [Database]({{ '/docs/database/' | relative_url }}) | Optional SQLite persistence with Active Record models and migrations. |
-| [Components]({{ '/docs/components/' | relative_url }}) | Built-in components, custom components, and interaction return values. |
-| [Themes]({{ '/docs/themes/' | relative_url }}) | Theme registration, tokens, and runtime theme switching. |
+| [Database]({{ '/docs/database/' | relative_url }}) | Environments, Active Record models, migrations, and the full db command suite. |
+| [Components]({{ '/docs/components/' | relative_url }}) | Built-in components, custom components, text capture, and interaction return values. |
+| [Themes]({{ '/docs/themes/' | relative_url }}) | Theme registration, derived themes, color capability, and runtime switching. |
 | [Logging]({{ '/docs/logging/' | relative_url }}) | Application and controller logging without corrupting TUI output. |
 | [API Reference]({{ '/docs/api/' | relative_url }}) | Compact public API reference. |
-| [Testing]({{ '/docs/testing/' | relative_url }}) | Controller, template, component, runtime, timer, and task tests. |
+| [Testing]({{ '/docs/testing/' | relative_url }}) | TestHelper, journey specs, and controller/component/runtime tests. |
+| [Example App: Journal]({{ '/docs/example-app/' | relative_url }}) | A complete demo app exercising every framework feature. |
 
 These docs contain detailed explanations and examples for Charming.

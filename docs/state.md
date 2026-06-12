@@ -129,6 +129,42 @@ def signup_form_submitted(values)
 end
 ```
 
+Form state outlives the screen, which is what you want for drafts — but when one
+form serves both "new" and "edit" modes, clear the stale draft when the mode (or the
+record) changes so the builder's defaults re-seed:
+
+```ruby
+before_action :prepare_form_state
+
+def prepare_form_state
+  mode = editing_entry ? "edit-#{editing_entry.id}" : "new"
+  return if session[:compose_mode] == mode
+
+  session[:compose_mode] = mode
+  session[:forms]&.delete(:entry)
+end
+```
+
+## Session Persistence
+
+Sessions are in-memory by default and vanish on quit. Opt into persistence per app:
+
+```ruby
+class MyApp::Application < Charming::Application
+  persist_session to: "tmp/session.json"
+end
+```
+
+The runtime saves on exit and the application reloads on boot. Only JSON-safe values
+survive: nil, booleans, numbers, strings, symbols, and arrays/hashes of those. Hash
+keys come back as symbols; symbol *values* come back as strings. Everything else —
+state objects, procs — is silently skipped, and the framework always excludes its
+internal keys (`focus_state`, `command_palette`, `mouse_targets`). A corrupt or
+missing file falls back to an empty session.
+
+Good candidates: the chosen theme (stored automatically by `use_theme`), scroll
+positions, and form drafts.
+
 ## What Not To Store In Controllers
 
 Avoid this for durable state:

@@ -43,20 +43,58 @@ Assigns passed to `new` become reader methods:
 
 | Component | Description |
 |-----------|-------------|
-| `TextInput` | Editable text field with cursor movement, selection, and insertion. |
-| `TextArea` | Editable multiline text field with cursor movement, newline insertion, and vertical clipping. |
-| `Form` | Huh-inspired form component with input, select, confirm, and note fields. |
+| `TextInput` | Editable text field. `masked: true` for passwords, `history: [...]` for REPL-style up/down recall, paste support. |
+| `TextArea` | Multiline editor. Plain Enter inserts a newline (`enter_newline: false` to opt out); paste support. |
+| `Form` | Huh-inspired form with input, textarea, select, confirm, and note fields. |
 | `List` | Selectable list with keyboard navigation and mouse support. |
-| `Modal` | Overlay dialog with title, content, and help text. |
+| `MultiSelectList` | List with `[x]` checkboxes — Space toggles, Enter submits the checked set, `max_selections:` caps it. |
+| `Table` | Unicode data table. `height:` adds a scrolling window with page up/down and window-relative clicks. |
+| `Tree` | Collapsible hierarchy — right/left expand/collapse, Enter selects leaves, mouse toggles branches. |
+| `Viewport` | Scrollable container for tall content, with wrapping and horizontal scroll. |
+| `Modal` | Overlay dialog with title, content, help text — `max_body_height:` makes the body scrollable. |
+| `Toast` | Auto-dismissing notification box with `:info`/`:success`/`:warn`/`:error` accents. |
+| `StatusBar` | One-row bar with left/center/right segments; pass `hints:` for key-hint pairs. |
+| `TabBar` | Horizontal tabs — left/right move, Enter selects, mouse clicks select. |
+| `Breadcrumbs` | `Home › Projects › Current` trail with the last item highlighted. |
+| `Badge` | Inline styled pill for statuses, counts, and versions. |
+| `Autocomplete` | Text input with a live-filtered suggestion dropdown. |
+| `HelpOverlay` | Keyboard cheat-sheet modal built from a controller's key bindings. |
+| `EmptyState` | "Nothing here yet" placeholder with loading and error variants. |
 | `CommandPaletteModal` | Standard modal wrapper for command palette content. |
-| `CommandPalette` | Fuzzy-search command input used internally by the framework. |
-| `Markdown` | CommonMark/GFM renderer backed by Commonmarker with Rouge syntax highlighting for code blocks. |
-| `Viewport` | Scrollable container for tall content lists. |
-| `Spinner` | Animated progress indicator. |
-| `ActivityIndicator` | Spinner-style activity indicator. |
+| `CommandPalette` | Fuzzy-search command picker used by the framework (and reusable). |
+| `Markdown` | CommonMark/GFM renderer backed by Commonmarker with Rouge syntax highlighting. |
+| `Spinner` | Animated frame-cycling indicator. |
+| `ActivityIndicator` | Gradient activity bar with label and ellipsis animation. |
 | `Progressbar` | Text-based progress bar. |
-| `Table` | Unicode-rendered data table with keyboard and mouse selection. |
+| `ErrorScreen` | The panel the runtime renders for unhandled exceptions (not usually built by hand). |
 | `KeyboardHandler` | Key-mapping mixin for custom components. |
+| `FuzzyMatcher` | fzf-style subsequence scorer used by the palette — `FuzzyMatcher.filter(query, items) { |i| i.label }`. |
+
+A few quick examples:
+
+```ruby
+# Toast — usually composited as a layout overlay
+Charming::Components::Toast.new(message: "Saved!", kind: :success, theme: theme)
+
+# StatusBar — bottom row with hints
+Charming::Components::StatusBar.new(
+  width: screen.width,
+  left: " Entries",
+  hints: [["enter", "open"], ["n", "new"], ["q", "quit"]],
+  right: "8 entries ",
+  theme: theme
+)
+
+# Tree — node hashes, mutated in place to track expansion
+Charming::Components::Tree.new(nodes: [
+  {label: "src", expanded: true, children: [{label: "main.rb"}]},
+  {label: "README.md"}
+])
+
+# Password input with shell-style history
+Charming::Components::TextInput.new(masked: true)
+Charming::Components::TextInput.new(history: ["last command", "older command"])
+```
 
 `ActivityIndicator` accepts `max_width:` and `fallback_label:` to keep labeled loading indicators stable in constrained layouts:
 
@@ -129,6 +167,36 @@ Return conventions:
 
 Controllers dispatch events to focused components when no higher-priority handler consumes the event.
 
+Component results map to controller hooks named after the focus slot: `:cancelled` →
+`<slot>_cancelled`, `[:selected, value]` → `<slot>_selected(value)`,
+`[:submitted, value]` → `<slot>_submitted(value)`.
+
+## Text Capture
+
+Components that accept free-typed text override `captures_text?` to return true
+(`TextInput`, `TextArea`, `Form`, `Autocomplete`, `CommandPalette`, and `HelpOverlay`
+do). While such a component is focused:
+
+- printable characters route to it **before** global and content key bindings —
+  typing `q` into a field inserts a q instead of quitting
+- `tab` reaches it before focus-ring traversal, so forms handle field navigation
+- ctrl/alt-modified shortcuts (`ctrl+p`, `ctrl+s`) keep working
+
+Two rules for your own components:
+
+1. Override `captures_text?` if users type prose into it.
+2. Focus-slot methods on controllers are invoked on key-dispatch paths where
+   `before_action` has **not** run — build the component from `session`/`params`,
+   never from hook-populated instance variables.
+
+## Paste
+
+The runtime enables bracketed paste, so pasted text arrives as a single
+`Charming::Events::PasteEvent` instead of a storm of key events. `TextInput` and
+`TextArea` implement `handle_paste(event)` (inputs strip newlines; textareas keep
+them and normalize CRLF). Custom components can implement it too — the focused
+component receives the event via the controller's `dispatch_paste`.
+
 ## Forms
 
 Build session-backed forms from controllers with `form(:name)`. Form state is stored as primitive values under `session[:forms]`, so input survives fresh controller instances.
@@ -173,8 +241,8 @@ Form fields:
 | Field | Behavior |
 |-------|----------|
 | `input` | Single-line text input. |
-| `textarea` | Multiline text input. Plain Enter advances/submits; Shift+Enter inserts a newline when supported; Ctrl+J inserts a newline. |
-| `select` | Single-choice picker. |
+| `textarea` | Multiline text input — Enter inserts a newline (twice for a blank line). |
+| `select` | Single-choice picker (`options:`, `option_label:` for display strings). |
 | `confirm` | Boolean yes/no field. |
 | `note` | Static, non-focusable text. |
 
@@ -182,14 +250,16 @@ Keyboard behavior:
 
 | Key | Behavior |
 |-----|----------|
-| `Tab` / `Shift+Tab` | Move between focusable fields. |
-| `Enter` | Move to the next field, or submit from the last field. |
-| `Shift+Enter` | Insert a newline in textarea fields when the terminal reports it distinctly. |
-| `Ctrl+J` | Insert a newline in textarea fields. |
+| `Tab` / `Shift+Tab` | Move between focusable fields (including out of a textarea). |
+| `Enter` | In a textarea: insert a newline. Elsewhere: next field, or submit from the last field. |
 | `Ctrl+S` | Submit the form from any field. |
 | `Escape` | Cancel the form. |
 | `Up` / `Down` | Change select choices. |
 | `Space`, `y`, `n` | Toggle or set confirm fields. |
+
+This matches charm.sh's huh: a textarea is a text editor, so it owns Enter — leave it
+with Tab and submit with Ctrl+S. (Shift+Enter/Ctrl+J/Ctrl+N also insert newlines, for
+muscle memory and for hosts that construct `TextArea` with `enter_newline: false`.)
 
 Focused form results dispatch to controller hooks named after the focus slot: `signup_form_submitted(values)` and `signup_form_cancelled`.
 

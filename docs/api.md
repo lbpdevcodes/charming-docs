@@ -46,10 +46,12 @@ Class APIs:
 - `routes { ... }` defines routes with the router DSL.
 - `logger value` sets the application logger. The default logger writes to `File::NULL`.
 - `root path` sets the application root path used for resolving relative files and templates.
-- `theme name, built_in: "phosphor"` registers a built-in JSON theme.
+- `theme name, built_in: "phosphor"` registers a built-in JSON theme (`phosphor`, `catppuccin-mocha`, `catppuccin-latte`, `gruvbox-dark`, `nord`, `tokyonight`).
 - `theme name, from: "config/themes/custom.json"` registers an app-local theme file.
+- `theme name, extends: :parent, overrides: {token => spec}` derives a theme from a registered one.
 - `default_theme name` sets the default theme.
 - `theme_for name` resolves a theme object.
+- `persist_session to: "tmp/session.json"` opts into JSON session persistence across restarts (framework-internal keys and non-JSON-safe values are excluded).
 - `namespace` returns the application namespace used for controller and template binding lookup.
 
 Instance APIs:
@@ -58,8 +60,13 @@ Instance APIs:
 - `logger` returns the application logger.
 - `logger=` overrides the logger for this application instance.
 - `session` returns persistent app session state.
+- `save_session` writes the session to the configured path (the runtime calls this on exit).
 - `theme` returns the active theme.
 - `use_theme name` switches the active theme.
+
+Environment:
+
+- `Charming.env` returns the current environment as a string inquirer (from `CHARMING_ENV`, default `"development"`): `Charming.env.test?`, `Charming.env.production?`.
 
 Entrypoint:
 
@@ -82,6 +89,7 @@ DSL methods:
 
 - `root "controller#action", title: "Home"` maps `/`.
 - `screen "/path", to: "controller#action", title: nil` maps a screen path.
+- Omitting `#action` in `to:` defaults the action to `#show`.
 
 Resolution rules:
 
@@ -108,17 +116,22 @@ Class APIs:
 - `key name, action, scope: :content` binds a content-pane key to an action.
 - `key name, action, scope: :global` binds an app-level shortcut.
 - `command label, action = nil, &block` adds a command palette item.
-- `timer name, every:, action:` dispatches a periodic timer while the route is active.
+- `timer name, every:, action:` dispatches a periodic timer while the route is active (`every:` must be positive).
 - `on_task name, action:` handles async task completion.
+- `on_task_progress name, action:` handles `progress.report` calls from a running task.
+- `before_action method, only: nil, except: nil` runs a hook before matching actions.
+- `after_action method, only: nil, except: nil` runs a hook after matching actions.
+- `around_action method, only: nil, except: nil` wraps matching actions (the hook must `yield`).
+- `rescue_from ExceptionClass, with: :handler` handles action exceptions (most-specific class wins).
 - `layout layout_class` wraps rendered output in a class-based layout view.
 - `layout "layouts/application"` wraps rendered output in an ERB template layout fallback.
 - `layout false` disables inherited layout wrapping.
-- `focus_ring *slots` defines tab-traversable focus slots.
+- `focus_ring *slots` defines tab-traversable focus slots (the first slot starts focused).
 
 Instance APIs:
 
-- `dispatch(action)` calls an action and returns a response.
-- `dispatch_key`, `dispatch_timer`, `dispatch_task`, and `dispatch_mouse` dispatch event-specific handlers.
+- `dispatch(action)` calls an action (through its hooks) and returns a response.
+- `dispatch_key`, `dispatch_timer`, `dispatch_task`, `dispatch_task_progress`, `dispatch_mouse`, and `dispatch_paste` dispatch event-specific handlers.
 - `render(body = "", **assigns)` produces a render response.
 - `render "literal"` renders a literal string.
 - `render :show, **assigns` renders a conventional Ruby view class, falling back to `app/views/<controller>/show.tui.erb` or `.txt.erb`.
@@ -129,18 +142,22 @@ Instance APIs:
 - `session` accesses the application session.
 - `logger` returns the application logger.
 - `state(name, state_class, **attributes)` stores or returns a session-backed state object.
-- `run_task(name) { ... }` submits async work.
+- `run_task(name, timeout: nil) { ... }` submits async work; blocks accepting an argument receive a `Tasks::Progress` reporter.
+- `cancel_task(name)` cancels an in-flight task (raises `Tasks::Cancelled` inside it).
 - `params` exposes current route params.
-- `event` exposes the current key, timer, task, resize, or mouse event.
+- `event` exposes the current key, timer, task, progress, resize, mouse, or paste event.
 - `screen` exposes terminal dimensions.
 - `theme` returns the current theme.
 - `use_theme(name)` switches themes.
 - `open_command_palette`, `close_command_palette`, and `command_palette` manage the command palette.
 - `open_theme_palette` opens the theme picker.
 - `command_palette_open?` returns whether a command or theme palette is open.
-- `focus_sidebar`, `focus_content`, `sidebar_focused?`, and `content_focused?` support generated layouts.
+- `focus` returns the controller's focus object (`focus.push_scope`, `focus.pop_scope`, `focus.cycle`, `focus.focus(slot)`, `focus.current`, `focus.ring`, `focus.overlay?`).
+- `focused?(slot)` asks whether a slot is currently focused.
+- `focus_sidebar`, `focus_content`, `sidebar_focused?`, and `content_focused?` support generated layouts (`focus_content` targets `:content` or the first non-sidebar slot in the ring).
+- `sidebar_routes` returns the routes listed in the sidebar — override to filter.
 
-Controller instances are ephemeral. Store durable state in `ApplicationState` objects through `state(...)`.
+Controller instances are ephemeral. Store durable state in `ApplicationState` objects through `state(...)`. Focus-slot component methods are invoked on key-dispatch paths where `before_action` has not run — build components from `session`/`params`, not hook-set instance variables.
 
 ## ApplicationState
 
@@ -279,30 +296,45 @@ Interactive components can implement:
 
 - `handle_key(event)`
 - `handle_mouse(event)`
+- `handle_paste(event)` for bracketed-paste text
+- `captures_text?` — return true when the component accepts free-typed prose; the controller then routes printable characters (and Tab) to it before key bindings
 
 Return conventions:
 
 - `:handled` means the event was consumed.
 - `[:selected, value]` means a value was selected.
+- `[:submitted, value]` means a value was submitted.
 - `:cancelled` means the interaction was cancelled.
 - `nil` means the event was not handled.
 
 Bundled components:
 
-- `Charming::Components::TextInput`
-- `Charming::Components::TextArea`
+- `Charming::Components::TextInput` — options include `masked:` (password rendering) and `history:` (up/down recall)
+- `Charming::Components::TextArea` — plain Enter inserts a newline by default (`enter_newline: false` to opt out)
 - `Charming::Components::Form`
 - `Charming::Components::List`
+- `Charming::Components::MultiSelectList` — `selected_indices:`, `max_selections:`; Space toggles, Enter submits `[:submitted, items]`
+- `Charming::Components::Table` — `height:` adds a scrolling window with page up/down
+- `Charming::Components::Tree` — collapsible node hashes (`{label:, children:, expanded:}`)
+- `Charming::Components::Viewport`
+- `Charming::Components::Modal` — `max_body_height:` makes the body scrollable; `scroll_offset` exposes the position
+- `Charming::Components::Toast` — `kind:` of `:info`, `:success`, `:warn`, `:error`
+- `Charming::Components::StatusBar` — `left:`, `center:`, `right:`, or `hints:` pairs
+- `Charming::Components::TabBar`
+- `Charming::Components::Breadcrumbs`
+- `Charming::Components::Badge`
+- `Charming::Components::Autocomplete`
+- `Charming::Components::HelpOverlay` — `HelpOverlay.for_controller(controller_class)` builds one from key bindings
+- `Charming::Components::EmptyState`
 - `Charming::Components::CommandPalette`
 - `Charming::Components::CommandPaletteModal`
-- `Charming::Components::Modal`
 - `Charming::Components::Markdown`
-- `Charming::Components::Viewport`
 - `Charming::Components::Spinner`
 - `Charming::Components::Progressbar`
 - `Charming::Components::ActivityIndicator`
-- `Charming::Components::Table`
-- `Charming::Components::KeyboardHandler`
+- `Charming::Components::ErrorScreen` — rendered by the runtime for unhandled exceptions
+- `Charming::Components::KeyboardHandler` (mixin)
+- `Charming::Components::FuzzyMatcher` — `score(query, candidate)` and `filter(query, candidates) { |c| label }`
 
 ActivityIndicator constructor options include `width:`, `label:`, `index:`, `seed:`, `chars:`, `gradient:`, `label_style:`, `max_width:`, and `fallback_label:`.
 
@@ -339,14 +371,14 @@ TextArea component constructor:
 - `height:` optional visible rows.
 - `cursor:` absolute cursor offset into `value`.
 - `offset:` first visible row.
-- `preferred_column:` remembered column for up/down movement.
+- `preferred_column:` remembered column for up/down movement (in display columns — wide characters count as two).
+- `enter_newline:` whether plain Enter inserts a newline (default `true`).
 
 Textarea keys:
 
-- Plain `Enter` is left for the form to advance or submit.
-- `Shift+Enter` inserts a newline when the terminal reports it distinctly.
-- `Ctrl+J` inserts a newline reliably.
-- `Ctrl+S` submits the form from any field.
+- Plain `Enter` inserts a newline (press twice for a blank line).
+- `Shift+Enter`, `Ctrl+J`, and `Ctrl+N` also insert newlines (and keep working when `enter_newline: false`).
+- In a form: `Tab` leaves the field, `Ctrl+S` submits from any field.
 
 Focused component result hooks:
 
@@ -378,6 +410,13 @@ Markdown parsing uses Commonmarker with CommonMark/GFM support. Syntax highlight
 - `Charming::UI.visible_slice(line, start_column, width)`
 - `Charming::UI::Width.measure(value)`
 - `Charming::UI::Width.strip_ansi(value)`
+
+Color capability (`Charming::UI::ColorSupport`):
+
+- `level` — the active capability: `:truecolor`, `:color256`, `:color16`, or `:none` (auto-detected from `NO_COLOR`, `COLORTERM`, `TERM`).
+- `level = value` — force a level; `nil` re-enables detection.
+- `at_least?(:color256)` — capability comparison.
+- Hex colors in styles and themes downconvert automatically to the active level.
 
 Styles are immutable builders:
 
@@ -415,13 +454,25 @@ Themes can be loaded with `theme name, built_in:` or `theme name, from:` on the 
 
 Runtime events include:
 
-- `Charming::Events::KeyEvent`
-- `Charming::Events::ResizeEvent`
-- `Charming::Events::MouseEvent`
-- `Charming::Events::TimerEvent`
-- `Charming::Events::TaskEvent`
+- `Charming::Events::KeyEvent` — `key`, `char`, `ctrl`, `alt`, `shift`
+- `Charming::Events::ResizeEvent` — `width`, `height`
+- `Charming::Events::MouseEvent` — `button`, `x`, `y`, modifiers, `click?`/`scroll?`/`release?`
+- `Charming::Events::TimerEvent` — `name`, `now`
+- `Charming::Events::TaskEvent` — `name`, `value`, `error`, `error?`
+- `Charming::Events::TaskProgressEvent` — `name`, `current`, `total`, `message`, `fraction`
+- `Charming::Events::PasteEvent` — `text` (bracketed paste)
+- `Charming::Events::FocusEvent` — `focused?` (terminal focus reporting; dispatched to an optional `focus_changed` action)
 
 Use `Charming.key_of(event)` when component code needs the normalized key symbol.
+
+## Tasks
+
+- `Charming::Tasks::ThreadedExecutor` — the default; one thread per task, name-based cancellation, graceful shutdown.
+- `Charming::Tasks::InlineExecutor` — synchronous; for deterministic tests.
+- `Charming::Tasks::Progress` — the reporter passed to task blocks: `progress.report(current, of: nil, message: nil)`.
+- `Charming::Tasks::Cancelled` — raised inside a task by `cancel_task` or a `timeout:`; arrives as the `TaskEvent#error`.
+
+Custom executors implement `submit(name, timeout: nil, &block)` (plain `submit(name, &block)` works until timeouts are used), plus optional `cancel(name)` and `shutdown(timeout:)`.
 
 ## Responses
 
@@ -452,6 +503,27 @@ The runtime follows navigation responses, renders render responses, and exits on
 
 ## Runtime And Testing Backends
 
-Apps normally use `TTYBackend` through `Charming.run`. Tests should use `Charming::Internal::Terminal::MemoryBackend` to avoid real terminal I/O.
+Apps normally use `TTYBackend` through `Charming.run`. Tests should use `Charming::Internal::Terminal::MemoryBackend` to avoid real terminal I/O. The runtime stops its loop when a test backend reports `exhausted?` (all pre-seeded events consumed), renders unhandled action exceptions as an `ErrorScreen` panel, and quits cleanly on SIGINT or an unbound `ctrl+c`.
+
+## TestHelper
+
+`require "charming/test_helper"` and `include Charming::TestHelper`:
+
+- `build_controller(klass, app:, screen:, route:, event:)` — controller with test defaults.
+- `key_event("ctrl+p")` — `KeyEvent` from a human-readable string.
+- `press(klass, "q", app:)` — dispatch one key press, returns the `Response`.
+- `press_sequence(klass, %w[down enter], app:)` — multiple presses sharing the app session.
+- `memory_backend("up", "q", width: 80, height: 24)` — pre-seeded `MemoryBackend`.
+
+RSpec matchers (registered when RSpec is loaded): `render_text("...")` and
+`render_match(/.../)` compare against the ANSI-stripped body; `navigate_to("/path")`
+asserts navigation; `be_quit` / `be_navigate` are response predicates.
+
+## CLI
+
+- `charming new NAME [--database sqlite3] [--force]` — scaffold an app.
+- `charming generate TYPE NAME [args]` (`g`) — `screen`, `controller`, `view`, `component`, `model`, `migration`.
+- `charming console` (`c`) — IRB with the app loaded and `app` available.
+- `charming db:COMMAND` — see [Database]({{ '/docs/database/' | relative_url }}) for the full command table.
 
 For testing patterns, see [Testing]({{ '/docs/testing/' | relative_url }}).

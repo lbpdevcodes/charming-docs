@@ -11,13 +11,15 @@ Themes provide semantic style tokens for templates, views, components, and layou
 
 ## Register Built-In Themes
 
-Generated apps register all built-in themes and choose `:phosphor` by default:
+Six themes ship with the framework: `phosphor`, `catppuccin-mocha`,
+`catppuccin-latte`, `gruvbox-dark`, `nord`, and `tokyonight`. Register the ones you
+want by name (or loop `Charming::UI::Theme.built_in_names` for all of them):
 
 ```ruby
 class MyApp::Application < Charming::Application
-  Charming::UI::Theme.built_in_names.each do |theme_name|
-    theme theme_name.to_sym, built_in: theme_name
-  end
+  theme :phosphor, built_in: "phosphor"
+  theme :mocha, built_in: "catppuccin-mocha"
+  theme :nord, built_in: "nord"
 
   default_theme :phosphor
 end
@@ -35,6 +37,39 @@ end
 ```
 
 Relative paths resolve from `Application.root` when set, otherwise from the current working directory.
+
+## Derive Themes
+
+`extends:` builds a theme from an already-registered one, merging `overrides:`
+(token name → style spec) on top:
+
+```ruby
+theme :base, built_in: "phosphor"
+theme :high_contrast, extends: :base, overrides: {
+  text: {foreground: "#ffffff", bold: true},
+  title: {foreground: "#FFD75F", bold: true}
+}
+```
+
+Override colors are literal (hex strings, named symbols, or 256-color indexes) — the
+parent's palette names are resolved when the parent loads. Register the parent before
+extending it.
+
+## Color Capability
+
+Themes are written in truecolor and degrade automatically. At boot,
+`Charming::UI::ColorSupport` classifies the terminal — `NO_COLOR` wins, then
+`COLORTERM` (`truecolor`/`24bit`), then `TERM` — into one of `:truecolor`,
+`:color256`, `:color16`, or `:none`. Hex colors downconvert to the nearest 256-color
+index or basic ANSI color as needed; at `:none`, color codes are omitted entirely
+(text attributes like bold survive).
+
+Force a level when needed (tests pin `:truecolor` for stable output):
+
+```ruby
+Charming::UI::ColorSupport.level = :color256
+Charming::UI::ColorSupport.level = nil   # back to auto-detection
+```
 
 ## Use Theme Tokens
 

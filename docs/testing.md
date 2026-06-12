@@ -27,6 +27,82 @@ bin/lint
 bin/check
 ```
 
+Apps generated with `--database sqlite3` get a spec_helper that pins
+`CHARMING_ENV=test` before the app loads, prepares the test database from
+`db/schema.rb`, and rolls back each example in a transaction — your specs run
+against `db/test.sqlite3` in full isolation.
+
+## Charming::TestHelper
+
+`charming/test_helper` is the fastest way to write controller and journey specs.
+It ships with the framework and registers RSpec matchers when RSpec is loaded:
+
+```ruby
+require "charming/test_helper"
+
+RSpec.describe MyApp::EntriesController do
+  include Charming::TestHelper
+
+  let(:app) { MyApp::Application.new }
+
+  it "renders the list" do
+    response = build_controller(described_class, app: app).dispatch(:show)
+    expect(response).to render_text("Entries")
+  end
+
+  it "navigates to compose on n" do
+    build_controller(described_class, app: app).dispatch(:show)
+    expect(press(described_class, "n", app: app)).to navigate_to("/compose")
+  end
+
+  it "deletes through the confirm modal" do
+    build_controller(described_class, app: app).dispatch(:show)
+    press_sequence(described_class, %w[d y], app: app)
+    expect(Entry.count).to eq(0)
+  end
+end
+```
+
+Helpers:
+
+| Helper | Purpose |
+|--------|---------|
+| `build_controller(klass, app:, screen:, route:, event:)` | Controller wired to an app (defaults: fresh `Application`, 80×24 screen). |
+| `key_event("ctrl+p")` | Build a `KeyEvent` from a human-readable string (`"q"`, `"down"`, `"shift+tab"`). |
+| `press(klass, "q", app:)` | Dispatch one key press; returns the `Response`. |
+| `press_sequence(klass, %w[down down enter], app:)` | Dispatch several presses through fresh controllers sharing the app session (mirrors the runtime). |
+| `memory_backend("up", "q", width: 80, height: 24)` | A `MemoryBackend` pre-seeded with parsed key events, ready for `Charming::Runtime`. |
+
+Matchers:
+
+| Matcher | Asserts |
+|---------|---------|
+| `render_text("Hello")` | The response body includes the text — compared **ANSI-stripped**, so styled output that interleaves escape codes mid-phrase still matches. |
+| `render_match(/Count: \d+/)` | Regex variant, also ANSI-stripped. |
+| `navigate_to("/path")` | The response is a navigation to that path. |
+| `be_quit` / `be_navigate` | Predicate matchers on `Response`. |
+
+## Journey Specs
+
+Drive the whole app through a real `Runtime` — actual keystrokes, no TTY:
+
+```ruby
+it "creates an entry end-to-end" do
+  keys = ["n", *"Demo day".chars, "enter", "down", "enter", *"It worked.".chars, "ctrl+s", "q"]
+  backend = memory_backend(*keys, width: 100, height: 30)
+
+  Charming::Runtime.new(MyApp::Application.new, backend: backend,
+    task_executor: Charming::Tasks::InlineExecutor).run
+
+  expect(Entry.find_by(title: "Demo day").body).to eq("It worked.")
+  expect(Charming::UI::Width.strip_ansi(backend.frames.last)).to include("Demo day")
+end
+```
+
+When a `MemoryBackend` runs out of events the runtime stops the loop
+(`MemoryBackend#exhausted?`), so a forgotten trailing quit event ends the test
+instead of hanging it.
+
 ## Controller Specs
 
 Instantiate controllers with an application and dispatch actions directly:
@@ -156,24 +232,27 @@ This avoids sleeps and makes timer behavior deterministic.
 
 ## Task Specs
 
-Use the inline task executor for deterministic async task tests:
+Use the inline task executor for deterministic async task tests — it runs blocks
+synchronously and queues results (and progress events) immediately:
 
 ```ruby
 runtime = Charming::Runtime.new(
   app,
   backend: backend,
-  task_executor: Charming::TaskExecutor::Inline
+  task_executor: Charming::Tasks::InlineExecutor
 )
 runtime.run
 ```
 
-Controller-level task tests can stub the app task executor:
+Controller-level task tests can stub the app task executor. The contract is
+`submit(name, timeout: nil, &block)` — the keyword is only passed when the caller
+sets a timeout, so the simple signature works until you test timeouts:
 
 ```ruby
 executor = Class.new do
   attr_reader :name
 
-  def submit(name, &)
+  def submit(name, timeout: nil, &)
     @name = name
   end
 end.new
@@ -183,6 +262,9 @@ controller.dispatch(:refresh)
 
 expect(executor.name).to eq(:refresh_home)
 ```
+
+Progress assertions: drain the queue and inspect `TaskProgressEvent`s
+(`current`, `total`, `message`, `fraction`) ahead of the final `TaskEvent`.
 
 ## Renderer Specs
 
