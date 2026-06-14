@@ -124,6 +124,7 @@ Pane styling options:
 | `focus: true` | Include this pane in the layout's Tab focus ring. |
 | `focused_style: theme.title` | Style the pane when it is focused. Defaults to `theme.title`. |
 | `clip: true` | Clip content to the pane. This is the default. |
+| `scroll: true` | Wrap the pane's content in a scrollable `Viewport` so tall content can scroll (the content must be a renderable component). |
 | `wrap: true` | Wrap long lines inside the pane. |
 
 Pane dimensions are outer dimensions. Borders and padding are included in the assigned width and height.

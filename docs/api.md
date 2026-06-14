@@ -1,7 +1,7 @@
 ---
 title: API Reference
 layout: default
-nav_order: 12
+nav_order: 13
 parent: Docs
 permalink: /docs/api/
 ---
@@ -332,6 +332,7 @@ Bundled components:
 - `Charming::Components::Spinner`
 - `Charming::Components::Progressbar`
 - `Charming::Components::ActivityIndicator`
+- `Charming::Components::Audio` — `▶`/`■` playback indicator for a `Charming::Audio::Player` (`player:`, `label:`)
 - `Charming::Components::ErrorScreen` — rendered by the runtime for unhandled exceptions
 - `Charming::Components::KeyboardHandler` (mixin)
 - `Charming::Components::FuzzyMatcher` — `score(query, candidate)` and `filter(query, candidates) { |c| label }`
@@ -474,6 +475,19 @@ Use `Charming.key_of(event)` when component code needs the normalized key symbol
 - `Charming::Tasks::Cancelled` — raised inside a task by `cancel_task` or a `timeout:`; arrives as the `TaskEvent#error`.
 
 Custom executors implement `submit(name, timeout: nil, &block)` (plain `submit(name, &block)` works until timeouts are used), plus optional `cancel(name)` and `shutdown(timeout:)`.
+
+## Audio
+
+`Charming::Audio::Player` plays a sound file by shelling out to a system audio binary. See [Audio]({{ '/docs/audio/' | relative_url }}) for the lifecycle and `run_task` pattern.
+
+- `Player.new(system: Charming::Audio::System.new)` — the `system:` adapter is injectable so specs never shell out.
+- `play(path)` — stops any current sound, spawns the resolved backend, returns the child PID; raises `Charming::Audio::Player::Unavailable` when no backend is installed.
+- `stop` — terminates and reaps the current child (no-op when idle).
+- `playing?` — true while the spawned sound is still running.
+- `wait` — blocks until the current sound finishes, then clears it (drive from a background task).
+- `available?` — true when a backend binary is installed for this platform.
+
+Backends resolve in order: `ffplay` (any platform), then `afplay` (macOS), `paplay`/`mpg123`/`aplay` (Linux). `Charming::Audio::System` wraps `Process`/`ENV`/`RbConfig` and exposes `macos?`, `linux?`, `which?(command)`, `spawn(argv)`, `terminate(pid)`, `alive?(pid)`, and `wait(pid)`.
 
 ## Responses
 

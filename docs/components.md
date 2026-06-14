@@ -66,6 +66,7 @@ Assigns passed to `new` become reader methods:
 | `Spinner` | Animated frame-cycling indicator. |
 | `ActivityIndicator` | Gradient activity bar with label and ellipsis animation. |
 | `Progressbar` | Text-based progress bar. |
+| `Audio` | One-line playback-status indicator (`▶`/`■` + label) for a `Charming::Audio::Player`. See [Audio]({{ '/docs/audio/' | relative_url }}). |
 | `ErrorScreen` | The panel the runtime renders for unhandled exceptions (not usually built by hand). |
 | `KeyboardHandler` | Key-mapping mixin for custom components. |
 | `FuzzyMatcher` | fzf-style subsequence scorer used by the palette — `FuzzyMatcher.filter(query, items) { |i| i.label }`. |

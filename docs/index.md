@@ -25,6 +25,7 @@ App builders:
 3. [State]({{ '/docs/state/' | relative_url }})
 4. [Database]({{ '/docs/database/' | relative_url }})
 5. [Logging]({{ '/docs/logging/' | relative_url }})
+6. [Audio]({{ '/docs/audio/' | relative_url }})
 
 UI builders:
 
@@ -52,6 +53,7 @@ Maintainers:
 | [Components]({{ '/docs/components/' | relative_url }}) | Built-in components, custom components, text capture, and interaction return values. |
 | [Themes]({{ '/docs/themes/' | relative_url }}) | Theme registration, derived themes, color capability, and runtime switching. |
 | [Logging]({{ '/docs/logging/' | relative_url }}) | Application and controller logging without corrupting TUI output. |
+| [Audio]({{ '/docs/audio/' | relative_url }}) | Cross-platform sound playback and the playback-status component. |
 | [API Reference]({{ '/docs/api/' | relative_url }}) | Compact public API reference. |
 | [Testing]({{ '/docs/testing/' | relative_url }}) | TestHelper, journey specs, and controller/component/runtime tests. |
 | [Example App: Journal]({{ '/docs/example-app/' | relative_url }}) | A complete demo app exercising every framework feature. |
