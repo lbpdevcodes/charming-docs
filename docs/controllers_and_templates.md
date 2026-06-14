@@ -2,7 +2,6 @@
 title: Controllers & Views
 layout: default
 nav_order: 5
-parent: Docs
 permalink: /docs/controllers-and-views/
 ---
 # Controllers & Views

@@ -1,14 +1,15 @@
-<!DOCTYPE html>
-<html lang="{{ site.lang | default: 'en-US' }}">
-{% include head.html %}
-<body class="landing-page">
+---
+layout: default
+---
+
+<div class="landing-page">
   <main class="landing-main">
 
     <section class="landing-hero">
       <div class="synth-stars" aria-hidden="true"></div>
       <div class="hero-content">
         <h1>{% include logo.html class="landing-logo" %}</h1>
-        {{ content }}
+        <p>A Rails-inspired Ruby <em>TUI</em> framework.</p>
 
         <aside class="hero-alert" role="note" aria-label="Pre-release notice">
           <span class="hero-alert__rail" aria-hidden="true"></span>
@@ -170,7 +171,7 @@
  ╚═══════════════════════╝</pre>
       <h2 id="cta-heading" class="cta-heading">Build it in your terminal.</h2>
       <div class="cta-actions">
-        <a href="{{ '/docs/' | relative_url }}" class="btn btn-primary">Read the Docs</a>
+        <a href="{{ '/docs/getting-started/' | relative_url }}" class="btn btn-primary">Read the Docs</a>
         <a href="https://github.com/pandorocks/charming" class="btn" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
       <footer class="landing-footer">
@@ -182,44 +183,47 @@
       </footer>
     </section>
 
-  </main>
+    <section class="landing-docs">
+      {{ content }}
+    </section>
 
-  <script>
-    (function () {
-      var buttons = document.querySelectorAll('.install-copy[data-copy-target]');
-      buttons.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var target = document.getElementById(btn.getAttribute('data-copy-target'));
-          if (!target) return;
-          var text = target.textContent.trim();
-          var label = btn.querySelector('.install-copy-label');
-          var done = label.getAttribute('data-copy-done');
-          var def = label.getAttribute('data-copy-default');
-          var commit = function () {
-            label.textContent = done;
-            btn.classList.add('is-copied');
-            setTimeout(function () {
-              label.textContent = def;
-              btn.classList.remove('is-copied');
-            }, 1400);
-          };
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(commit, function () { commit(); });
-          } else {
-            var ta = document.createElement('textarea');
-            ta.value = text;
-            ta.setAttribute('readonly', '');
-            ta.style.position = 'absolute';
-            ta.style.left = '-9999px';
-            document.body.appendChild(ta);
-            ta.select();
-            try { document.execCommand('copy'); } catch (e) {}
-            document.body.removeChild(ta);
-            commit();
-          }
-        });
+  </main>
+</div>
+
+<script>
+  (function () {
+    var buttons = document.querySelectorAll('.install-copy[data-copy-target]');
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = document.getElementById(btn.getAttribute('data-copy-target'));
+        if (!target) return;
+        var text = target.textContent.trim();
+        var label = btn.querySelector('.install-copy-label');
+        var done = label.getAttribute('data-copy-done');
+        var def = label.getAttribute('data-copy-default');
+        var commit = function () {
+          label.textContent = done;
+          btn.classList.add('is-copied');
+          setTimeout(function () {
+            label.textContent = def;
+            btn.classList.remove('is-copied');
+          }, 1400);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(commit, function () { commit(); });
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+          commit();
+        }
       });
-    })();
-  </script>
-</body>
-</html>
+    });
+  })();
+</script>

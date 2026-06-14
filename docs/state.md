@@ -2,7 +2,6 @@
 title: State
 layout: default
 nav_order: 7
-parent: Docs
 permalink: /docs/state/
 ---
 # State

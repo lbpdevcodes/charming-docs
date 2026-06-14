@@ -2,7 +2,6 @@
 title: CLI & Generators
 layout: default
 nav_order: 14
-parent: Docs
 permalink: /docs/cli/
 ---
 # CLI & Generators

@@ -2,14 +2,13 @@
 title: API Reference
 layout: default
 nav_order: 15
-parent: Docs
 permalink: /docs/api/
 ---
 # API Reference
 
 This is a compact reference for Charming's current public API. Prefer these APIs in app code. Classes under `Charming::Internal` are runtime internals and are documented mainly for testing.
 
-For tutorial-style explanations, see [Getting Started]({{ '/docs/getting-started/' | relative_url }}). For topic guides, see the [docs index]({{ '/docs/' | relative_url }}).
+For tutorial-style explanations, see [Getting Started]({{ '/docs/getting-started/' | relative_url }}). For topic guides, see the [docs index]({{ '/' | relative_url }}).
 
 ## Application
 

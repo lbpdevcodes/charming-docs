@@ -2,7 +2,6 @@
 title: Core Concepts
 layout: default
 nav_order: 3
-parent: Docs
 permalink: /docs/core-concepts/
 ---
 # Core Concepts

@@ -2,7 +2,6 @@
 title: Routing
 layout: default
 nav_order: 4
-parent: Docs
 permalink: /docs/routing/
 ---
 # Routing

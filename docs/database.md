@@ -2,7 +2,6 @@
 title: Database
 layout: default
 nav_order: 8
-parent: Docs
 permalink: /docs/database/
 ---
 # Database

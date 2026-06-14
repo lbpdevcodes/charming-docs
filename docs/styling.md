@@ -2,7 +2,6 @@
 title: Styling
 layout: default
 nav_order: 11
-parent: Docs
 permalink: /docs/styling/
 ---
 # Styling

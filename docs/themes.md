@@ -2,7 +2,6 @@
 title: Themes
 layout: default
 nav_order: 10
-parent: Docs
 permalink: /docs/themes/
 ---
 # Themes

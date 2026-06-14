@@ -2,7 +2,6 @@
 title: Getting Started
 layout: default
 nav_order: 2
-parent: Docs
 permalink: /docs/getting-started/
 ---
 # Getting Started

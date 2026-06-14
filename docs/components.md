@@ -2,7 +2,6 @@
 title: Components
 layout: default
 nav_order: 9
-parent: Docs
 permalink: /docs/components/
 ---
 # Components

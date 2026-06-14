@@ -2,7 +2,6 @@
 title: Testing
 layout: default
 nav_order: 16
-parent: Docs
 permalink: /docs/testing/
 ---
 # Testing

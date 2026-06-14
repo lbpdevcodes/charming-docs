@@ -265,12 +265,12 @@ strong, b {
 
 .landing-page .hero-content h1 .landing-logo {
   display: inline-block;
-  max-width: calc(100vw - 3rem);
+  max-width: calc(100cqw - 3rem);
   height: auto;
   margin-inline: auto;
   padding: 0;
   overflow: visible;
-  font-size: clamp(2rem, 8vw, 8rem);
+  font-size: clamp(2rem, 8cqw, 8rem);
   line-height: 1.08;
   text-align: center;
   text-overflow: clip;
@@ -306,15 +306,48 @@ strong, b {
 // docs body never inherits any of this.
 // ============================================================================
 
+// The landing now lives INSIDE the Just the Docs shell (default layout) as the
+// Home page, rather than being its own <body>. It is a wrapper div in
+// .main-content; each section brings its own background, so the wrapper stays
+// transparent and lets the docs chrome (sidebar/header) sit around it.
 .landing-page {
   margin: 0;
-  background: var(--bg-void);
-  min-height: 100vh;
+  background: transparent;
   overflow-x: hidden;
+  // Establish a query container so the landing's responsive type scales to THIS
+  // column's width (viewport minus sidebar), not the full viewport. Every `cqw`
+  // below resolves against this width — without it, `vw` overshoots and the
+  // big Monoton title overflows/clips inside the docs shell.
+  container-type: inline-size;
 }
 
 .landing-page::before { display: none; } // suppress the site grain on hero
 .landing-page::after  { display: none; }
+
+// Break the home page out of the theme's 50rem content cap so the landing keeps
+// its full-bleed scenery. Scoped via :has() to the Home page only — every other
+// docs page keeps the standard constrained column. The sidebar is unaffected.
+.main:has(.landing-page) {
+  max-width: none;
+}
+
+.main-content-wrap:has(.landing-page) {
+  padding: 0;
+  max-width: none;
+}
+
+.main:has(.landing-page) .main-content {
+  max-width: none;
+  padding: 0;
+}
+
+// The folded docs index ({{ content }}) is ordinary docs prose — re-constrain it
+// to a readable column and restore padding, since the wrapper above stripped it.
+.landing-docs {
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+}
 
 .landing-main {
   position: relative;
@@ -375,7 +408,7 @@ strong, b {
   display: flex;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 11vw, 8rem);
+  font-size: clamp(3.5rem, 11cqw, 8rem);
   font-weight: 400;
   letter-spacing: 0.06em;
   margin: 0 0 1rem 0;
@@ -395,7 +428,7 @@ strong, b {
 
 .landing-page .hero-content p {
   font-family: var(--font-body);
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  font-size: clamp(1rem, 1.6cqw, 1.25rem);
   color: var(--text-primary);
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -460,7 +493,7 @@ strong, b {
 .landing-page .hero-content .hero-alert__body {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: clamp(0.72rem, 1.05vw, 0.82rem);
+  font-size: clamp(0.72rem, 1.05cqw, 0.82rem);
   line-height: 1.55;
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.86);
@@ -580,7 +613,7 @@ strong, b {
   }
   .section-header h2 {
     font-family: var(--font-heading);
-    font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+    font-size: clamp(1.6rem, 3.6cqw, 2.6rem);
     letter-spacing: 0.06em;
     margin: 0;
     color: var(--neon-cyan);
@@ -909,7 +942,7 @@ strong, b {
 
     .conviction {
       font-family: var(--font-display);
-      font-size: clamp(1.6rem, 4.2vw, 3.2rem);
+      font-size: clamp(1.6rem, 4.2cqw, 3.2rem);
       letter-spacing: 0.06em;
       line-height: 1.25;
       color: var(--text-primary);
@@ -1071,7 +1104,7 @@ strong, b {
 
     .cta-heading {
       font-family: var(--font-heading);
-      font-size: clamp(1.5rem, 3.6vw, 2.4rem);
+      font-size: clamp(1.5rem, 3.6cqw, 2.4rem);
       letter-spacing: 0.06em;
       color: var(--neon-cyan);
       text-shadow: var(--glow-cyan);

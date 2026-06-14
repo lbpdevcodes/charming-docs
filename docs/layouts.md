@@ -2,7 +2,6 @@
 title: Layouts
 layout: default
 nav_order: 6
-parent: Docs
 permalink: /docs/layouts/
 ---
 # Layouts

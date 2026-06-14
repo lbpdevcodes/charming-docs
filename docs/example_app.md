@@ -2,7 +2,6 @@
 title: "Example App: Journal"
 layout: default
 nav_order: 17
-parent: Docs
 permalink: /docs/example-app/
 ---
 # Example App: Journal
