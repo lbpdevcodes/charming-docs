@@ -1,7 +1,7 @@
 ---
 title: API Reference
 layout: default
-nav_order: 13
+nav_order: 15
 parent: Docs
 permalink: /docs/api/
 ---
@@ -400,6 +400,8 @@ Markdown component constructor:
 Markdown parsing uses Commonmarker with CommonMark/GFM support. Syntax highlighting uses Rouge. Charming maps parsed nodes and Rouge tokens to terminal text through a Glamour-inspired Markdown style config and ANSI theme styling. Supported GFM rendering includes tables, task lists, strikethrough, autolinks, links, terminal-friendly image labels, definition lists, and footnotes.
 
 ## UI
+
+For a guided tour of the `Style` builder, colors, and borders, see [Styling]({{ '/docs/styling/' | relative_url }}).
 
 `Charming::UI` provides ANSI-aware layout helpers:
 

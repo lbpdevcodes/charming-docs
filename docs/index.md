@@ -16,7 +16,8 @@ New users:
 1. [Getting Started]({{ '/docs/getting-started/' | relative_url }})
 2. [Core Concepts]({{ '/docs/core-concepts/' | relative_url }})
 3. [Layouts]({{ '/docs/layouts/' | relative_url }})
-4. [Example App: Journal]({{ '/docs/example-app/' | relative_url }})
+4. [CLI & Generators]({{ '/docs/cli/' | relative_url }})
+5. [Example App: Journal]({{ '/docs/example-app/' | relative_url }})
 
 App builders:
 
@@ -32,6 +33,7 @@ UI builders:
 1. [Layouts]({{ '/docs/layouts/' | relative_url }})
 2. [Components]({{ '/docs/components/' | relative_url }})
 3. [Themes]({{ '/docs/themes/' | relative_url }})
+4. [Styling]({{ '/docs/styling/' | relative_url }})
 
 Maintainers:
 
@@ -52,8 +54,10 @@ Maintainers:
 | [Database]({{ '/docs/database/' | relative_url }}) | Environments, Active Record models, migrations, and the full db command suite. |
 | [Components]({{ '/docs/components/' | relative_url }}) | Built-in components, custom components, text capture, and interaction return values. |
 | [Themes]({{ '/docs/themes/' | relative_url }}) | Theme registration, derived themes, color capability, and runtime switching. |
+| [Styling]({{ '/docs/styling/' | relative_url }}) | The `Style` builder: text attributes, colors, borders, padding, and block composition. |
 | [Logging]({{ '/docs/logging/' | relative_url }}) | Application and controller logging without corrupting TUI output. |
 | [Audio]({{ '/docs/audio/' | relative_url }}) | Cross-platform sound playback and the playback-status component. |
+| [CLI & Generators]({{ '/docs/cli/' | relative_url }}) | The `charming` executable: `new`, every generator, `console`, and `db:install`. |
 | [API Reference]({{ '/docs/api/' | relative_url }}) | Compact public API reference. |
 | [Testing]({{ '/docs/testing/' | relative_url }}) | TestHelper, journey specs, and controller/component/runtime tests. |
 | [Example App: Journal]({{ '/docs/example-app/' | relative_url }}) | A complete demo app exercising every framework feature. |

@@ -247,6 +247,33 @@ end
 `every:` must be positive — a zero or negative interval raises `ArgumentError` at
 declaration time (it would busy-loop the runtime).
 
+## Terminal Focus
+
+When the terminal window gains or loses focus, the runtime dispatches an optional
+`focus_changed` action (it enables focus reporting mode automatically). Define the
+action to react — a common use is pausing a timer-driven clock or animation while the
+window is in the background so it isn't burning CPU:
+
+```ruby
+class DashboardController < Charming::Controller
+  timer :clock, every: 1, action: :tick
+
+  def focus_changed
+    dashboard.active = event.focused?   # event is a Charming::Events::FocusEvent
+    show
+  end
+
+  def tick
+    return show unless dashboard.active
+    dashboard.now = Time.now
+    show
+  end
+end
+```
+
+`event.focused?` is `true` on focus gain and `false` on blur. Controllers that don't
+define `focus_changed` simply ignore the event.
+
 ## Background Tasks
 
 Register a task handler and dispatch work with `run_task`:

@@ -7,7 +7,7 @@ permalink: /docs/themes/
 ---
 # Themes
 
-Themes provide semantic style tokens for templates, views, components, and layouts. Use theme tokens instead of hardcoded colors whenever possible.
+Themes provide semantic style tokens for templates, views, components, and layouts. Use theme tokens instead of hardcoded colors whenever possible. Each token is a `Charming::UI::Style` object — see [Styling]({{ '/docs/styling/' | relative_url }}) for what you can do with one.
 
 ## Register Built-In Themes
 

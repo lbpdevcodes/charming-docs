@@ -210,6 +210,32 @@ def sidebar_options
 end
 ```
 
+## Mouse Interaction
+
+Every render registers the layout's named panes as mouse targets (each pane's
+rectangle plus its slot name). When a mouse event arrives, the runtime hit-tests it
+against those rectangles — the topmost matching pane wins — so clicks map back to the
+same slots used by Tab traversal:
+
+- Clicking a **focusable** pane (`focus: true`) moves focus to that slot, so you get
+  click-to-focus for free.
+- If a method named after the slot returns a component that implements
+  `handle_mouse(event)`, that component receives the event with pane-local
+  coordinates, and its return value maps to the slot's hooks (`<slot>_selected`, etc.).
+
+```ruby
+screen_layout do
+  split(:horizontal) do
+    pane(:files, width: 32, focus: true) { files_list }   # click focuses this pane
+    pane(:preview, grow: 1, focus: true) { preview }
+  end
+end
+```
+
+`MouseEvent` exposes `x`/`y`, modifier flags, and the predicates `click?`, `scroll?`,
+and `release?`. For component-level mouse handling and the return conventions, see the
+[Components]({{ '/docs/components/' | relative_url }}#mouse-events) guide.
+
 ## Modal Overlays
 
 Use `overlay` inside `screen_layout` for command palettes, dialogs, tooltips, or toasts:
