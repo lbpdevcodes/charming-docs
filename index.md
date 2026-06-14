@@ -12,9 +12,10 @@ Use the sidebar to browse all guides, or jump in by what you are trying to do.
 New users:
 
 1. [Getting Started]({{ '/docs/getting-started/' | relative_url }})
-2. [Core Concepts]({{ '/docs/core-concepts/' | relative_url }})
-3. [Layouts]({{ '/docs/layouts/' | relative_url }})
-4. [Example App: Journal]({{ '/docs/example-app/' | relative_url }})
+2. [Tutorials]({{ '/docs/tutorials/' | relative_url }})
+3. [Core Concepts]({{ '/docs/core-concepts/' | relative_url }})
+4. [Layouts]({{ '/docs/layouts/' | relative_url }})
+5. [Example App: Journal]({{ '/docs/example-app/' | relative_url }})
 
 App builders:
 
@@ -41,6 +42,7 @@ Maintainers:
 | Guide | Purpose |
 |-------|---------|
 | [Getting Started]({{ '/docs/getting-started/' | relative_url }}) | Build and run a generated Charming app. |
+| [Tutorials]({{ '/docs/tutorials/' | relative_url }}) | Build real apps end to end, from `charming new` to a finished TUI. |
 | [Core Concepts]({{ '/docs/core-concepts/' | relative_url }}) | App architecture, runtime flow, ephemeral controllers, and state. |
 | [Routing]({{ '/docs/routing/' | relative_url }}) | `root`, `screen`, dynamic params, route titles, and route order. |
 | [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }}) | Actions, `render :show`, `render_template`, key bindings, commands, timers, and tasks. |

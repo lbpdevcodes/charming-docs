@@ -5,5 +5,14 @@ color_scheme: synthwave
 
 url: https://pandorocks.github.io
 
+# Callout boxes used in the docs (e.g. {: .note } / {: .important } on a blockquote).
+callouts:
+  note:
+    title: Note
+    color: blue
+  important:
+    title: Important
+    color: yellow
+
 aux_links:
   Charming on GitHub: https://github.com/pandorocks/charming
