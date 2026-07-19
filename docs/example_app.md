@@ -21,8 +21,8 @@ From a framework checkout:
 ```sh
 cd examples/journal
 bundle install
-bundle exec ruby -I../../lib ../../exe/charming db:setup   # create + migrate + seed
-bundle exec exe/journal
+bundle exec charming db:setup   # create + load schema + seed
+bundle exec journal
 ```
 
 ## Keys
