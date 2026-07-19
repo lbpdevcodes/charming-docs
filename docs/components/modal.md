@@ -14,11 +14,11 @@ Modal is a centered, boxed overlay with an optional title and help line around a
 │                                                  │
 │               Delete entry                       │
 │                                                  │
-│  y deletes · n or esc cancels                    │
-│                                                  │
 │  Delete "Morning pages"?                         │
 │                                                  │
 │  This cannot be undone.                          │
+│                                                  │
+│  y deletes · n or esc cancels                    │
 │                                                  │
 ╰──────────────────────────────────────────────────╯
 ```
@@ -74,7 +74,7 @@ The controller routes keys to it by pushing a focus scope while it is open: `foc
 |--------|---------|--------------|
 | `content:` | required | The body — a string, or anything responding to `render` (View or Component). |
 | `title:` | `nil` | Centered heading at the top, in `theme.title`. |
-| `help:` | `nil` | Muted line rendered between the title and the body. |
+| `help:` | `nil` | Muted footer line rendered below the body. |
 | `width:` | `52` | Content width. The theme's border and padding add columns on top (6 with the default `theme.modal`). |
 | `max_body_height:` | `nil` | Caps the visible body rows. A taller body is windowed through a Viewport and becomes scrollable. |
 | `scroll_offset:` | `0` | Restores a previous scroll position. |
@@ -104,5 +104,5 @@ When the body fits (or no `max_body_height:` was given), `handle_key` returns `n
 ## Tips
 
 - Components are rebuilt on every event, so a scroll position does not survive on its own. Read `modal.scroll_offset` after dispatching a key, stash it in `session`, and pass it back as `scroll_offset:` when you rebuild the modal.
-- The `help:` line renders *above* the body, not as a footer — the stacking order is title, help, content.
+- The `help:` line renders as a footer below the body — the stacking order is title, content, help. It stays put when a `max_body_height:` body scrolls.
 - `style:` replaces `theme.modal` wholesale; set your own border, padding, and width on it if you use it.

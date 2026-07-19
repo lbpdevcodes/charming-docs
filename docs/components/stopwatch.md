@@ -79,6 +79,6 @@ All mutators return `self`, so calls chain.
 
 ## Tips
 
-- Whole seconds only: `tick` converts its argument with `to_i`, so `tick(0.25)` truncates to zero. Fire your controller timer at `every: 1`, or count sub-second ticks in state and pass whole seconds.
+- Fractional ticks accumulate while running: a controller timer firing at `every: 0.5` can call `tick(0.5)` and two ticks advance the clock one second. The display still shows whole seconds (`TimeDisplay.clock` floors).
 - `tick` on a stopped stopwatch silently does nothing — a stopwatch that "never moves" usually means `start` was never called.
 - The component measures nothing itself; elapsed time is exactly the sum of your ticks. A paused controller timer pauses the stopwatch.

@@ -103,4 +103,4 @@ An empty value shows all suggestions (up to the cap); otherwise matches are the 
 
 - Persist `value`, `cursor`, and `selected_index` — the component is rebuilt from primitives on every event.
 - The highlight is clamped after every edit, so it never points past the (possibly shrunken) match list — but it does not reset to 0 when the query changes; persist what the component reports.
-- Autocomplete does not implement `handle_paste`, so pasted text is currently dropped rather than inserted into the query. Use a plain [TextInput]({{ '/docs/components/text-input/' | relative_url }}) if paste-to-filter matters.
+- Pasting works: `handle_paste` inserts the pasted text into the query at the cursor and re-filters the suggestions, just like typing.

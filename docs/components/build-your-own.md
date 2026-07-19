@@ -165,7 +165,9 @@ end
 
 The built-ins show the two sensible policies: `TextInput` strips newlines and
 control characters (it is single-line), while `TextArea` keeps newlines and
-normalizes CRLF to LF.
+normalizes CRLF to LF. `Form` forwards paste to its focused field (text fields
+insert it, other field types ignore it) and `Autocomplete` inserts into its
+query and re-filters.
 
 ## Handling the mouse
 

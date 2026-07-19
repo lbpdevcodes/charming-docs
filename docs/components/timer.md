@@ -72,6 +72,6 @@ end
 
 ## Tips
 
-- Whole seconds only: `tick` converts its argument with `to_i`, so `tick(0.25)` truncates to zero and does nothing. Fire your controller timer at `every: 1` and use the default `tick`, or count sub-second ticks in state and pass whole seconds.
-- `duration:` is also truncated to an integer — `duration: 90.5` becomes 90 seconds.
+- Fractional ticks accumulate: a controller timer firing at `every: 0.25` can call `tick(0.25)` and four ticks advance the clock one second. The display still shows whole seconds (`TimeDisplay.clock` floors).
+- `duration:` is truncated to an integer — `duration: 90.5` becomes 90 seconds.
 - The renderable holds no wall-clock reference; it only knows what you `tick` into it. If your timer pauses (for example while the terminal is unfocused), the countdown pauses too.

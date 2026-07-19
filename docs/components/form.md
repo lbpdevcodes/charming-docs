@@ -168,6 +168,10 @@ On failure the errors render under their fields, focus jumps to the first invali
 
 This matches charm.sh's huh: a textarea is a text editor, so it owns Enter — leave it with Tab and submit with Ctrl+S. (Shift+Enter, Ctrl+J, and Ctrl+N also insert newlines, for muscle memory and for hosts that construct `TextArea` with `enter_newline: false`.)
 
+## Pasting
+
+Bracketed paste routes to the focused field. Input fields insert the pasted text at the cursor (newlines stripped, single-line); textarea fields keep newlines and normalize CRLF to `\n`. Select, multiselect, confirm, and note fields ignore paste. The pasted value and cursor persist to form state like any other edit.
+
 ## What it returns
 
 `handle_key` returns `[:submitted, values]` when validation passes (values is a `{field_name => value}` hash), `:cancelled` on Escape, and `:handled` while editing. On a focus slot these invoke `<slot>_submitted(values)` and `<slot>_cancelled` — the slot is the controller method name (`entry_form` above), not the form name. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
