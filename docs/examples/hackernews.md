@@ -7,7 +7,7 @@ permalink: /docs/examples/hackernews/
 ---
 # Hacker News
 
-The app from the landing page: a terminal reader for Hacker News. Browse the
+A terminal reader for Hacker News. Browse the
 top, new, best, Ask HN, Show HN, and jobs feeds, open articles inline, and
 navigate with a Vim-inspired keyboard layout — all themeable with the built-in
 Charming themes. The source lives at

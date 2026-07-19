@@ -569,7 +569,6 @@ strong, b {
     border: 0;
   }
 
-  section.landing-showcase,
   section.landing-stack,
   section.landing-philosophy,
   section.landing-quickstart,
@@ -756,53 +755,7 @@ strong, b {
     overflow-x: auto;
   }
 
-  // 2. SHOWCASE — live demo -------------------------------------------------
-  section.landing-showcase {
-    background: var(--stucco);
-
-    .showcase-frame {
-      position: relative;
-      z-index: 2;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0;
-      background: transparent;
-      border: 0;
-      box-shadow: 0 30px 70px -30px rgba(20, 56, 63, 0.45);
-      border-radius: 5px;
-      overflow: hidden;
-    }
-
-    .showcase-image {
-      display: block;
-      width: 100%;
-      height: auto;
-      margin: 0;
-      border: 0;
-      filter: saturate(1.05) contrast(1.02);
-    }
-
-    .showcase-caption {
-      text-align: center;
-      margin: 1.5rem auto 0;
-      max-width: 600px;
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
-      color: var(--ink-soft);
-      letter-spacing: 0.06em;
-      position: relative;
-      z-index: 2;
-
-      code {
-        color: var(--flamingo-deep);
-        background: transparent;
-        padding: 0;
-        border: none;
-      }
-    }
-  }
-
-  // 3. STACK — feature grid -------------------------------------------------
+  // 2. STACK — feature grid -------------------------------------------------
   section.landing-stack {
     background: var(--plaster);
     border-top: 1px solid var(--sand);
@@ -901,7 +854,7 @@ strong, b {
     }
   }
 
-  // 4. PHILOSOPHY — convictions in poolside script -------------------------
+  // 3. PHILOSOPHY — convictions in poolside script -------------------------
   section.landing-philosophy {
     padding: 9rem 1.5rem;
     background:
@@ -957,7 +910,7 @@ strong, b {
     }
   }
 
-  // 5. QUICKSTART LADDER ---------------------------------------------------
+  // 4. QUICKSTART LADDER ---------------------------------------------------
   section.landing-quickstart {
     background: var(--stucco);
     border-top: 1px solid var(--sand);
@@ -1046,7 +999,7 @@ strong, b {
     }
   }
 
-  // 6. FINAL CTA + FOOTER --------------------------------------------------
+  // 5. FINAL CTA + FOOTER --------------------------------------------------
   section.landing-cta {
     padding: 7rem 1.5rem 3rem;
     text-align: center;
@@ -1152,7 +1105,6 @@ strong, b {
   }
 
   .landing-page {
-    section.landing-showcase,
     section.landing-stack,
     section.landing-philosophy,
     section.landing-quickstart,
@@ -1163,11 +1115,6 @@ strong, b {
 
     .install-cmd   { font-size: 0.92rem; }
     .install-glyph { font-size: 0.92rem; }
-
-    section.landing-showcase {
-      .terminal-body { padding: 0.85rem 0.9rem; }
-      .terminal-body pre.tui { font-size: 0.7rem; }
-    }
 
     section.landing-stack .stack-grid {
       grid-template-columns: 1fr;
