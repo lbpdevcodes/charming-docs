@@ -1,10 +1,11 @@
 ---
-title: "Example App: Journal"
+title: Journal
 layout: default
-nav_order: 17
+parent: Examples
+nav_order: 1
 permalink: /docs/example-app/
 ---
-# Example App: Journal
+# Journal
 
 What the blog tutorial is to Rails, the Journal is to Charming: a complete,
 runnable demo app that exercises every major framework feature. It lives in the

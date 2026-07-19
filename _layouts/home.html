@@ -6,13 +6,11 @@ layout: default
   <main class="landing-main">
 
     <section class="landing-hero">
-      <div class="synth-stars" aria-hidden="true"></div>
       <div class="hero-content">
         <h1>{% include logo.html class="landing-logo" %}</h1>
         <p>A Rails-inspired Ruby <em>TUI</em> framework.</p>
 
         <aside class="hero-alert" role="note" aria-label="Pre-release notice">
-          <span class="hero-alert__rail" aria-hidden="true"></span>
           <span class="hero-alert__tab">[ ! ] PRE-RELEASE // UNSTABLE</span>
           <p class="hero-alert__body">
             <span class="hero-alert__line">STATUS: ALPHA &mdash; APIs, BEHAVIOR, AND GENERATED APP STRUCTURE MAY CHANGE.</span>
@@ -32,12 +30,17 @@ layout: default
           </button>
         </div>
       </div>
+
+      <div class="hero-horizon" aria-hidden="true">
+        <div class="hero-ocean"></div>
+        {% include skyline.html %}
+      </div>
     </section>
 
     <section class="landing-showcase" aria-labelledby="showcase-heading">
       <header class="section-header">
         <span class="section-kicker">// live demo</span>
-        <h2 id="showcase-heading">What Charming can render</h2>
+        <h2 id="showcase-heading">A Hacker News reader, in your terminal</h2>
       </header>
 
       <figure class="showcase-frame">
@@ -48,7 +51,7 @@ layout: default
              decoding="async">
       </figure>
 
-      <p class="showcase-caption">&uarr; a real <code>charming</code> app, rendered in your terminal.</p>
+      <p class="showcase-caption">&uarr; a real <code>charming</code> app &mdash; panes, lists, and key bindings, drawn entirely in text. <a href="{{ '/docs/examples/hackernews/' | relative_url }}">source &amp; docs &rarr;</a></p>
     </section>
 
     <section class="landing-stack" aria-labelledby="stack-heading">
@@ -117,9 +120,9 @@ layout: default
           <span class="quickstart-numeral" aria-hidden="true">01</span>
           <div class="terminal-window terminal-window--small">
             <div class="terminal-titlebar">
-              <span class="terminal-dot terminal-dot--pink"></span>
-              <span class="terminal-dot terminal-dot--yellow"></span>
-              <span class="terminal-dot terminal-dot--cyan"></span>
+              <span class="terminal-dot terminal-dot--flamingo"></span>
+              <span class="terminal-dot terminal-dot--peach"></span>
+              <span class="terminal-dot terminal-dot--turquoise"></span>
               <span class="terminal-title">install</span>
             </div>
             <div class="terminal-body">
@@ -133,9 +136,9 @@ layout: default
           <span class="quickstart-numeral" aria-hidden="true">02</span>
           <div class="terminal-window terminal-window--small">
             <div class="terminal-titlebar">
-              <span class="terminal-dot terminal-dot--pink"></span>
-              <span class="terminal-dot terminal-dot--yellow"></span>
-              <span class="terminal-dot terminal-dot--cyan"></span>
+              <span class="terminal-dot terminal-dot--flamingo"></span>
+              <span class="terminal-dot terminal-dot--peach"></span>
+              <span class="terminal-dot terminal-dot--turquoise"></span>
               <span class="terminal-title">generate</span>
             </div>
             <div class="terminal-body">
@@ -150,9 +153,9 @@ layout: default
           <span class="quickstart-numeral" aria-hidden="true">03</span>
           <div class="terminal-window terminal-window--small">
             <div class="terminal-titlebar">
-              <span class="terminal-dot terminal-dot--pink"></span>
-              <span class="terminal-dot terminal-dot--yellow"></span>
-              <span class="terminal-dot terminal-dot--cyan"></span>
+              <span class="terminal-dot terminal-dot--flamingo"></span>
+              <span class="terminal-dot terminal-dot--peach"></span>
+              <span class="terminal-dot terminal-dot--turquoise"></span>
               <span class="terminal-title">run</span>
             </div>
             <div class="terminal-body">
@@ -169,7 +172,7 @@ layout: default
  ╔═══════════════════════╗
  ║   C  H  A  R  M  I  N  G   ║
  ╚═══════════════════════╝</pre>
-      <h2 id="cta-heading" class="cta-heading">Build it in your terminal.</h2>
+      <h2 id="cta-heading" class="cta-heading">Build something charming.</h2>
       <div class="cta-actions">
         <a href="{{ '/docs/getting-started/' | relative_url }}" class="btn btn-primary">Read the Docs</a>
         <a href="https://github.com/pandorocks/charming" class="btn" target="_blank" rel="noopener noreferrer">GitHub</a>
@@ -180,6 +183,8 @@ layout: default
         <a href="https://github.com/pandorocks/charming/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT</a>
         <span aria-hidden="true">·</span>
         <a href="https://github.com/pandorocks/charming" target="_blank" rel="noopener noreferrer">github.com/pandorocks/charming</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://charm.land/" target="_blank" rel="noopener noreferrer">inspired by the charmbracelet stack</a>
       </footer>
     </section>
 

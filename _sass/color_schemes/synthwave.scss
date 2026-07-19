@@ -1,43 +1,40 @@
-// Synthwave / Miami Vice color scheme for Just the Docs.
+// Miami Vice — daytime South Beach color scheme for Just the Docs.
 // Loaded after color_schemes/light.scss, so these win.
 
-$color-scheme: dark;
+$color-scheme: light;
 
 // Palette ---------------------------------------------------------------
-$sw-bg-void:      #07061a;
-$sw-bg-deep:      #120a2e;
-$sw-bg-elevated:  #1c1145;
-$sw-border-dim:   #2a1a5e;
+$sw-stucco:         #f7f1e6; // page surface
+$sw-plaster:        #fdfaf3; // raised surfaces
+$sw-sand:           #eadfca; // borders / dividers
 
-$sw-neon-pink:    #ff2975;
-$sw-neon-cyan:    #00f0ff;
-$sw-neon-purple:  #b967ff;
-$sw-neon-yellow:  #ffd319;
-$sw-neon-orange:  #ff901f;
+$sw-ink:            #14383f; // deep teal ink
+$sw-ink-soft:       #4a6f78;
 
-$sw-text-primary: #f4f4ff;
-$sw-text-muted:   #a890d4;
+$sw-flamingo:       #f0437c; // display accent (large type only)
+$sw-flamingo-deep:  #c2185b; // links + small text
+$sw-turquoise:      #17a795; // display accent
+$sw-turquoise-deep: #0b7a6c; // small text
+$sw-coral-deep:     #b84a1a; // small warm text
+
+$sw-term-bg:        #0e2b33; // terminals + code blocks stay dark — islands of night
 
 // Just the Docs variable overrides --------------------------------------
-$body-background-color:      $sw-bg-deep;
-$body-heading-color:         $sw-neon-cyan;
-$body-text-color:            $sw-text-primary;
-$link-color:                 $sw-neon-pink;
-$nav-child-link-color:       $sw-text-muted;
-$sidebar-color:              $sw-bg-void;
-$base-button-color:          $sw-bg-elevated;
-$btn-primary-color:          $sw-neon-pink;
-$code-background-color:      $sw-bg-elevated;
-$code-linenumber-color:      $sw-text-muted;
-$feedback-color:             darken($sw-bg-void, 2%);
-$table-background-color:     $sw-bg-elevated;
-$search-background-color:    $sw-bg-elevated;
-$search-result-preview-color: $sw-text-muted;
-$border-color:               $sw-border-dim;
+$body-background-color:      $sw-stucco;
+$body-heading-color:         $sw-ink;
+$body-text-color:            $sw-ink;
+$link-color:                 $sw-flamingo-deep;
+$nav-child-link-color:       $sw-ink-soft;
+$sidebar-color:              $sw-plaster;
+$base-button-color:          $sw-plaster;
+$btn-primary-color:          $sw-flamingo-deep;
+$code-background-color:      $sw-term-bg;
+$code-linenumber-color:      #96bcc6;
+$feedback-color:             darken($sw-plaster, 3%);
+$table-background-color:     $sw-plaster;
+$search-background-color:    $sw-plaster;
+$search-result-preview-color: $sw-ink-soft;
+$border-color:               $sw-sand;
 
-// Pygments highlight theme — github-dark looks fine against our bg-elevated.
+// Pygments highlight theme — code blocks remain dark, so github-dark stays.
 @import "./vendor/accessible-pygments/github-dark";
-
-.highlight {
-  // padding: 0 !important;
-}

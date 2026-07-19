@@ -13,7 +13,7 @@ generators and tools the framework ships. Work through them in order; they grow
 from a single screen to richer, multi-screen apps.
 
 Where [Getting Started]({{ '/docs/getting-started/' | relative_url }}) tours a
-generated app and the [Example App: Journal]({{ '/docs/example-app/' | relative_url }})
+generated app and the [Journal example]({{ '/docs/example-app/' | relative_url }})
 shows a finished reference, these tutorials sit in between: you type the commands
 and write the code yourself.
 

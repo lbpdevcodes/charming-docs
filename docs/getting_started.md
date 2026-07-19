@@ -266,4 +266,4 @@ For controller, template, component, timer, task, and runtime testing patterns, 
 
 The framework repository ships a full demo at `examples/journal` — a Markdown
 journal exercising forms, hooks, async tasks with progress, modals, toasts, themes,
-and journey specs. See [Example App: Journal]({{ '/docs/example-app/' | relative_url }}).
+and journey specs. See the [Journal example]({{ '/docs/example-app/' | relative_url }}).

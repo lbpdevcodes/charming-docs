@@ -15,7 +15,7 @@ New users:
 2. [Tutorials]({{ '/docs/tutorials/' | relative_url }})
 3. [Core Concepts]({{ '/docs/core-concepts/' | relative_url }})
 4. [Layouts]({{ '/docs/layouts/' | relative_url }})
-5. [Example App: Journal]({{ '/docs/example-app/' | relative_url }})
+5. [Examples]({{ '/docs/examples/' | relative_url }})
 
 App builders:
 
@@ -54,4 +54,4 @@ Maintainers:
 | [Logging]({{ '/docs/logging/' | relative_url }}) | Application and controller logging without corrupting TUI output. |
 | [API Reference]({{ '/docs/api/' | relative_url }}) | Compact public API reference. |
 | [Testing]({{ '/docs/testing/' | relative_url }}) | TestHelper, journey specs, and controller/component/runtime tests. |
-| [Example App: Journal]({{ '/docs/example-app/' | relative_url }}) | A complete demo app exercising every framework feature. |
+| [Examples]({{ '/docs/examples/' | relative_url }}) | Complete demo apps: the Journal reference app and a Pac-Man arcade clone. |

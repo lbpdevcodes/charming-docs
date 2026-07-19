@@ -37,7 +37,7 @@ The `▸` marks which part has focus — here the task list. `Tab` moves it betw
 add-task input and the list.
 
 This is a single-screen app, which keeps the focus on the essentials. The
-[Example App: Journal]({{ '/docs/example-app/' | relative_url }}) shows where to go
+[Journal example]({{ '/docs/example-app/' | relative_url }}) shows where to go
 next — multiple screens, forms, modals, and async work.
 
 ## 1. Install and scaffold
@@ -795,7 +795,7 @@ To grow it:
   reusable widget — for example a confirm-before-delete modal (the journal app has
   one).
 - **Toasts, help overlays, async tasks.** All demonstrated in the
-  [Example App: Journal]({{ '/docs/example-app/' | relative_url }}).
+  [Journal example]({{ '/docs/example-app/' | relative_url }}).
 
 Reference docs for everything you used here:
 [CLI & Generators]({{ '/docs/cli/' | relative_url }}),

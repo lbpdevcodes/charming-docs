@@ -1,37 +1,50 @@
 // ============================================================================
-// Synthwave / Miami Vice — custom layer (loaded LAST by Just the Docs).
+// Miami Vice — daytime South Beach custom layer (loaded LAST by Just the Docs).
 //
 // Two responsibilities:
 //   1. Site-wide refinements that the color scheme alone can't express
-//      (typography, glow, code-block accents, button styling).
-//   2. Landing-only hero scenery (.landing-page { ... }) — sun, perspective
-//      grid, scanlines, Monoton title. Scoped so it never bleeds into docs.
+//      (typography, code-block accents, button styling).
+//   2. Landing-only hero scenery (.landing-page { ... }) — hazy morning sky,
+//      heat-haze sun, pastel deco skyline. Scoped so it never bleeds into docs.
+//
+// One rule carried over from the show: no earth tones. Surfaces are stucco and
+// plaster; accents are flamingo, turquoise, and coral. Terminal windows and
+// code blocks deliberately stay DARK — islands of night on the sunlit page.
 // ============================================================================
 
 :root {
-  --bg-void:        #07061a;
-  --bg-deep:        #120a2e;
-  --bg-elevated:    #1c1145;
-  --border-dim:     #2a1a5e;
+  --stucco:         #f7f1e6; // page surface
+  --plaster:        #fdfaf3; // raised surfaces
+  --sand:           #eadfca; // borders / dividers
 
-  --neon-pink:      #ff2975;
-  --neon-cyan:      #00f0ff;
-  --neon-purple:    #b967ff;
-  --neon-yellow:    #ffd319;
-  --neon-orange:    #ff901f;
+  --ink:            #14383f; // deep teal ink — body text
+  --ink-soft:       #4a6f78; // muted text
 
-  --text-primary:   #f4f4ff;
-  --text-muted:     #a890d4;
+  --flamingo:        #f0437c; // display accent — large type only
+  --flamingo-deep:   #c2185b; // links + small text (contrast-safe)
+  --turquoise:       #17a795; // display accent
+  --turquoise-deep:  #0b7a6c; // small text (contrast-safe)
+  --coral:           #e07a3f; // display accent
+  --coral-deep:      #b84a1a; // small warm text (contrast-safe)
 
-  --font-display:   "Monoton", "Audiowide", system-ui, sans-serif;
-  --font-heading:   "Audiowide", "Chakra Petch", system-ui, sans-serif;
+  // Pastels for painted surfaces
+  --blush:          #f9cfd8;
+  --mint:           #bfe8dc;
+  --cream:          #f3e6c9;
+  --palm-green:     #1d4b44;
+
+  // The dark terminal island
+  --term-bg:        #0e2b33;
+  --term-text:      #f6f0e4;
+  --term-muted:     #96bcc6;
+  --term-turquoise: #2ee6c8;
+  --term-flamingo:  #ff5b94;
+  --term-peach:     #ffb07c;
+
+  --font-display:   "Kaushan Script", "Brush Script MT", cursive;
+  --font-heading:   "Italiana", "Didot", "Bodoni MT", serif;
   --font-body:      "Chakra Petch", system-ui, sans-serif;
   --font-mono:      "JetBrains Mono", ui-monospace, monospace;
-
-  --glow-cyan:      0 0 6px rgba(0, 240, 255, 0.55),
-                    0 0 18px rgba(0, 240, 255, 0.28);
-  --glow-pink:      0 0 6px rgba(255, 41, 117, 0.65),
-                    0 0 22px rgba(255, 41, 117, 0.32);
 }
 
 // ----------------------------------------------------------------------------
@@ -39,61 +52,74 @@
 // ----------------------------------------------------------------------------
 
 html {
-  background: var(--bg-void);
+  background: var(--stucco);
 }
 
 body {
   background:
-    radial-gradient(ellipse at 50% -10%, rgba(185, 103, 255, 0.18), transparent 60%),
-    radial-gradient(ellipse at 100% 100%, rgba(255, 41, 117, 0.10), transparent 50%),
-    var(--bg-deep);
-  color: var(--text-primary);
+    radial-gradient(ellipse at 50% -10%, rgba(255, 255, 255, 0.55), transparent 55%),
+    var(--stucco);
+  color: var(--ink);
   font-family: var(--font-body);
   font-weight: 400;
   letter-spacing: 0.005em;
 }
 
-// SVG grain overlay, fixed, behind content. ~3% intensity.
+// SVG grain overlay, fixed, behind content — sun-bleached paper texture.
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.035;
-  mix-blend-mode: overlay;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
+// Keyboard focus — deep turquoise, visible on every surface.
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--turquoise-deep);
+  outline-offset: 2px;
+}
+
 // ----------------------------------------------------------------------------
-// Typography — headings get Audiowide + cyan glow
+// Typography — the title-card pairing: Italiana thin serif caps for major
+// headings (the "VICE" role); Chakra Petch caps for minor headings.
+// Daytime means clean shadows, not neon glow.
 // ----------------------------------------------------------------------------
 
-h1, h2, h3, .text-alpha, .text-beta, .text-gamma {
+h1, h2, .text-alpha, .text-beta {
   font-family: var(--font-heading);
   font-weight: 400;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 h1, .text-alpha {
-  color: var(--neon-cyan);
-  text-shadow: var(--glow-cyan);
+  color: var(--ink);
 }
 
 h2, .text-beta {
-  color: var(--neon-cyan);
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
+  color: var(--turquoise-deep);
 }
 
 h3, .text-gamma {
-  color: var(--neon-pink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--flamingo-deep);
 }
 
 h4, h5, h6 {
-  font-family: var(--font-heading);
-  color: var(--text-muted);
-  letter-spacing: 0.08em;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--ink-soft);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -103,25 +129,24 @@ h4, h5, h6 {
 
 a,
 .main-content a {
-  color: var(--neon-pink);
-  text-decoration-color: rgba(255, 41, 117, 0.45);
+  color: var(--flamingo-deep);
+  text-decoration-color: rgba(194, 24, 91, 0.4);
   text-underline-offset: 3px;
-  transition: color 160ms ease, text-shadow 160ms ease;
+  transition: color 160ms ease;
 }
 
 a:hover,
 .main-content a:hover {
-  color: #ff5d97;
-  text-shadow: var(--glow-pink);
-  text-decoration-color: var(--neon-pink);
+  color: var(--flamingo);
+  text-decoration-color: var(--flamingo);
 }
 
 strong, b {
-  color: var(--neon-yellow);
+  color: var(--coral-deep);
 }
 
 // ----------------------------------------------------------------------------
-// Code — inline + blocks
+// Code — inline stays light, blocks stay dark (the terminal island)
 // ----------------------------------------------------------------------------
 
 .main-content code {
@@ -130,9 +155,9 @@ strong, b {
 }
 
 .main-content :not(pre) > code {
-  color: var(--neon-pink);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-dim);
+  color: var(--flamingo-deep);
+  background: var(--plaster);
+  border: 1px solid var(--sand);
   padding: 0.08em 0.4em;
   border-radius: 2px;
 }
@@ -140,12 +165,10 @@ strong, b {
 // Outer wrapper owns the background, accent stripe, and border.
 .main-content div.highlighter-rouge,
 .main-content figure.highlight {
-  background: var(--bg-elevated);
-  border-left: 3px solid var(--neon-cyan);
-  border-radius: 2px;
-  box-shadow:
-    inset 0 0 0 1px var(--border-dim),
-    0 0 24px -8px rgba(0, 240, 255, 0.35);
+  background: var(--term-bg);
+  border-left: 3px solid var(--turquoise);
+  border-radius: 3px;
+  box-shadow: 0 16px 40px -20px rgba(20, 56, 63, 0.45);
 }
 
 // Inner Pygments elements are transparent so the wrapper's chrome shows once.
@@ -156,7 +179,7 @@ strong, b {
   background: transparent;
   border: 0;
   box-shadow: none;
-  color: var(--text-primary);
+  color: var(--term-text);
 }
 
 // ----------------------------------------------------------------------------
@@ -164,23 +187,24 @@ strong, b {
 // ----------------------------------------------------------------------------
 
 .main-content table {
-  border: 1px solid var(--border-dim);
+  border: 1px solid var(--sand);
 }
 .main-content table th {
-  background: var(--bg-elevated);
-  color: var(--neon-cyan);
-  font-family: var(--font-heading);
+  background: var(--plaster);
+  color: var(--turquoise-deep);
+  font-family: var(--font-body);
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .main-content table td {
-  border-color: var(--border-dim);
+  border-color: var(--sand);
 }
 
 .main-content blockquote {
-  border-left: 3px solid var(--neon-purple);
-  background: rgba(185, 103, 255, 0.06);
-  color: var(--text-muted);
+  border-left: 3px solid var(--coral);
+  background: rgba(224, 122, 63, 0.07);
+  color: var(--ink-soft);
   padding: 0.75rem 1rem;
   margin: 1rem 0;
 }
@@ -191,49 +215,52 @@ strong, b {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    var(--neon-pink) 30%,
-    var(--neon-cyan) 70%,
+    var(--flamingo) 30%,
+    var(--turquoise) 70%,
     transparent 100%
   );
 }
 
 // ----------------------------------------------------------------------------
-// Buttons — outlined neon, fill on hover
+// Buttons — ink outline, fills on hover
 // ----------------------------------------------------------------------------
 
 .btn,
 .main-content .btn {
-  font-family: var(--font-heading);
-  letter-spacing: 0.08em;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   background: transparent;
-  color: var(--neon-cyan);
-  border: 1px solid var(--neon-cyan);
+  color: var(--ink);
+  border: 1px solid var(--ink);
   border-radius: 2px;
   box-shadow: none;
   transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease,
-    transform 160ms ease;
+    transform 160ms ease, border-color 160ms ease;
 }
 
 .btn:hover,
 .main-content .btn:hover {
-  background: rgba(0, 240, 255, 0.08);
-  color: var(--neon-cyan);
-  box-shadow: var(--glow-cyan);
+  background: rgba(23, 167, 149, 0.12);
+  color: var(--turquoise-deep);
+  border-color: var(--turquoise-deep);
+  box-shadow: 0 8px 20px -10px rgba(20, 56, 63, 0.35);
   transform: translateY(-1px);
 }
 
 .btn-primary,
 .main-content .btn-primary {
-  background: var(--neon-pink);
-  color: var(--bg-void);
-  border-color: var(--neon-pink);
+  background: var(--flamingo-deep);
+  color: #fff;
+  border-color: var(--flamingo-deep);
 }
 .btn-primary:hover,
 .main-content .btn-primary:hover {
-  background: #ff447e;
-  color: var(--bg-void);
-  box-shadow: var(--glow-pink);
+  background: var(--flamingo);
+  color: #fff;
+  border-color: var(--flamingo);
+  box-shadow: 0 10px 24px -10px rgba(194, 24, 91, 0.5);
 }
 
 // ----------------------------------------------------------------------------
@@ -241,22 +268,27 @@ strong, b {
 // ----------------------------------------------------------------------------
 
 .side-bar {
-  border-right: 1px solid var(--border-dim);
+  border-right: 1px solid var(--sand);
 }
 
+// Wordmark — the "Miami" role: flamingo brush script on plaster.
+// Kaushan is a connected script: letter-spacing must stay 0 or the joins break.
 .site-title,
 .wordmark {
   font-family: var(--font-display);
-  line-height: 1.1;
-  letter-spacing: 0.06em;
-  color: var(--neon-pink) !important;
-  text-shadow: var(--glow-pink);
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--flamingo) !important;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 4px 14px rgba(240, 67, 124, 0.3);
   text-decoration: none;
 }
 
 .site-title {
-  font-size: 1.4rem;
-  // Long titles in Monoton would otherwise overflow the 60px site-header.
+  font-size: 1.5rem;
+  // Long titles would otherwise overflow the 60px site-header.
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -268,48 +300,47 @@ strong, b {
   max-width: calc(100cqw - 3rem);
   height: auto;
   margin-inline: auto;
-  padding: 0;
+  padding: 0 0.2em 0.1em; // room for the script's swashes and descenders
   overflow: visible;
-  font-size: clamp(2rem, 8cqw, 8rem);
-  line-height: 1.08;
+  font-size: clamp(3rem, 9cqw, 7.5rem);
+  line-height: 1.15;
   text-align: center;
   text-overflow: clip;
   text-transform: none;
 }
 
 .nav-list .nav-list-item .nav-list-link {
-  color: var(--text-muted);
+  color: var(--ink-soft);
   transition: color 140ms ease;
 }
 .nav-list .nav-list-item .nav-list-link:hover {
-  color: var(--neon-cyan);
-  text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+  color: var(--turquoise-deep);
 }
 .nav-list .nav-list-item .nav-list-link.active {
-  color: var(--neon-pink);
+  color: var(--flamingo-deep);
   font-weight: 600;
 }
 
 .search-input {
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border-dim);
+  background: var(--plaster);
+  color: var(--ink);
+  border: 1px solid var(--sand);
 }
 .search-input:focus {
   outline: none;
-  border-color: var(--neon-cyan);
-  box-shadow: var(--glow-cyan);
+  border-color: var(--turquoise-deep);
+  box-shadow: 0 0 0 3px rgba(23, 167, 149, 0.2);
 }
 
 // ============================================================================
-// LANDING ONLY — full Miami Vice scenery. Scoped to .landing-page so the
-// docs body never inherits any of this.
+// LANDING ONLY — the daytime scene. Scoped to .landing-page so the docs body
+// never inherits any of this.
 // ============================================================================
 
-// The landing now lives INSIDE the Just the Docs shell (default layout) as the
-// Home page, rather than being its own <body>. It is a wrapper div in
-// .main-content; each section brings its own background, so the wrapper stays
-// transparent and lets the docs chrome (sidebar/header) sit around it.
+// The landing lives INSIDE the Just the Docs shell (default layout) as the
+// Home page. It is a wrapper div in .main-content; each section brings its own
+// background, so the wrapper stays transparent and lets the docs chrome
+// (sidebar/header) sit around it.
 .landing-page {
   margin: 0;
   background: transparent;
@@ -317,11 +348,11 @@ strong, b {
   // Establish a query container so the landing's responsive type scales to THIS
   // column's width (viewport minus sidebar), not the full viewport. Every `cqw`
   // below resolves against this width — without it, `vw` overshoots and the
-  // big Monoton title overflows/clips inside the docs shell.
+  // big script title overflows/clips inside the docs shell.
   container-type: inline-size;
 }
 
-.landing-page::before { display: none; } // suppress the site grain on hero
+.landing-page::before { display: none; }
 .landing-page::after  { display: none; }
 
 // Break the home page out of the theme's 50rem content cap so the landing keeps
@@ -355,6 +386,8 @@ strong, b {
   padding: 0;
 }
 
+// The signature: hazy aqua morning sky warming toward the shore, with the
+// pastel Ocean Drive skyline pinned to the horizon.
 .landing-hero {
   position: relative;
   width: 100%;
@@ -362,35 +395,36 @@ strong, b {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 10vh;
-  padding-bottom: 8vh;
+  padding-top: 9vh;
+  padding-bottom: 0;
   overflow: hidden;
   background:
     linear-gradient(
       180deg,
-      #07061a 0%,
-      #1a0b3d 45%,
-      #3d1361 60%,
-      #07061a 100%
+      #a8dde8 0%,
+      #c4e7ec 35%,
+      #e8ecdf 62%,
+      #f6e8d2 78%,
+      #ffe9d6 100%
     );
 }
 
-// Star field — three radial-gradients of varying density
-.synth-stars {
+// Heat-haze sun, high and white.
+.landing-hero::before {
+  content: "";
   position: absolute;
-  inset: 0 0 55% 0;
+  top: 4%;
+  right: 12%;
+  width: clamp(180px, 24cqw, 340px);
+  height: clamp(180px, 24cqw, 340px);
   z-index: 1;
-  background-image:
-    radial-gradient(1px 1px at 20% 30%, #fff, transparent 50%),
-    radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.7), transparent 50%),
-    radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,0.85), transparent 50%),
-    radial-gradient(1px 1px at 85% 45%, rgba(255,255,255,0.5), transparent 50%),
-    radial-gradient(1.2px 1.2px at 10% 70%, #fff, transparent 50%),
-    radial-gradient(1px 1px at 55% 25%, rgba(255,255,255,0.6), transparent 50%),
-    radial-gradient(1px 1px at 30% 12%, rgba(255,255,255,0.9), transparent 50%),
-    radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.5), transparent 50%);
-  background-repeat: no-repeat;
-  opacity: 0.9;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 246, 224, 0.55) 35%,
+    transparent 70%
+  );
 }
 
 // Hero content — sits above the scenery
@@ -404,36 +438,36 @@ strong, b {
   max-width: none;
 }
 
+// "Charming" — the "Miami" of the lockup: flamingo script against the sky.
 .landing-page .hero-content h1 {
   display: flex;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 11cqw, 8rem);
   font-weight: 400;
-  letter-spacing: 0.06em;
-  margin: 0 0 1rem 0;
-  line-height: 1;
-  color: #fff;
+  letter-spacing: 0;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.15;
+  color: var(--flamingo);
   text-transform: none;
-  // Layered neon glow — cyan halo + pink bloom + tight white core
   text-shadow:
-    0 0 2px #fff,
-    0 0 8px rgba(255, 255, 255, 0.8),
-    0 0 18px var(--neon-pink),
-    0 0 32px var(--neon-pink),
-    0 0 56px rgba(255, 41, 117, 0.65),
-    -2px 0 6px rgba(0, 240, 255, 0.7),
-    2px 0 6px rgba(255, 41, 117, 0.7);
+    0 2px 0 rgba(255, 255, 255, 0.85),
+    0 6px 24px rgba(240, 67, 124, 0.25);
 }
 
-.landing-page .hero-content p {
-  font-family: var(--font-body);
-  font-size: clamp(1rem, 1.6cqw, 1.25rem);
-  color: var(--text-primary);
-  letter-spacing: 0.18em;
+// The tagline — the "VICE" of the lockup: thin serif caps, tracked wide.
+.landing-page .hero-content > p {
+  font-family: var(--font-heading);
+  font-size: clamp(0.95rem, 1.8cqw, 1.4rem);
+  color: var(--ink);
+  letter-spacing: 0.42em;
+  text-indent: 0.42em; // re-center: trailing tracking pads the right edge
   text-transform: uppercase;
   margin: 0 0 2rem 0;
-  opacity: 0.92;
+}
+
+.landing-page .hero-content > p em {
+  font-style: normal;
+  color: var(--flamingo-deep);
 }
 
 .landing-page .hero-content .btn {
@@ -441,9 +475,9 @@ strong, b {
   margin: 0 0.4rem;
   padding: 0.7rem 1.6rem;
   font-size: 0.85rem;
-  font-family: var(--font-heading);
 }
 
+// Pre-release notice — a motel-sign plaque: plaster, turquoise tube border.
 .landing-page .hero-content .hero-alert {
   position: relative;
   z-index: 30;
@@ -451,26 +485,11 @@ strong, b {
   box-sizing: border-box;
   width: clamp(320px, 86%, 760px);
   margin: 2.25rem auto 0;
-  padding: 1rem 1.1rem 1rem 2.25rem;
-  background: #000;
-  border: 1px solid var(--neon-yellow);
-  border-left: 0;
+  padding: 1rem 1.1rem;
+  background: var(--plaster);
+  border: 1px solid var(--turquoise);
+  box-shadow: 0 10px 30px -14px rgba(20, 56, 63, 0.35);
   text-align: left;
-}
-
-.landing-page .hero-content .hero-alert__rail {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 14px;
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--neon-yellow) 0,
-    var(--neon-yellow) 8px,
-    #000 8px,
-    #000 16px
-  );
 }
 
 .landing-page .hero-content .hero-alert__tab {
@@ -479,8 +498,8 @@ strong, b {
   left: -1px;
   display: inline-block;
   padding: 0.22rem 0.6rem;
-  background: var(--neon-yellow);
-  color: #000;
+  background: var(--turquoise);
+  color: #fff;
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 700;
@@ -496,7 +515,7 @@ strong, b {
   font-size: clamp(0.72rem, 1.05cqw, 0.82rem);
   line-height: 1.55;
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--ink-soft);
   text-transform: uppercase;
 }
 
@@ -507,7 +526,7 @@ strong, b {
 .landing-page .hero-content .hero-alert__cursor {
   display: inline-block;
   margin-left: 0.18em;
-  color: var(--neon-yellow);
+  color: var(--coral-deep);
   animation: hero-alert-blink 1.05s steps(2, end) infinite;
 }
 
@@ -515,35 +534,21 @@ strong, b {
   50% { opacity: 0; }
 }
 
-// Hero scanlines — applied only to the hero section so docs stay clean.
-.landing-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 20;
+// The horizon — pastel deco hotels and palms. The skyline's ground band
+// matches the next section's stucco, so the hero dissolves into the page.
+.landing-page .hero-horizon {
+  position: relative;
+  width: 100%;
+  margin-top: 5rem;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 2px,
-    rgba(0, 0, 0, 0.18) 2px,
-    rgba(0, 0, 0, 0.18) 3px
-  );
-  mix-blend-mode: multiply;
 }
 
-// CRT vignette
-.landing-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 19;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 55%,
-    rgba(0, 0, 0, 0.55) 100%
-  );
+.landing-page .hero-skyline {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: clamp(110px, 15vw, 200px);
 }
 
 // ============================================================================
@@ -575,24 +580,12 @@ strong, b {
     overflow: hidden;
   }
 
-  section.landing-showcase::before,
-  section.landing-stack::before,
-  section.landing-philosophy::before,
-  section.landing-quickstart::before,
-  section.landing-cta::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 2px,
-      rgba(0, 0, 0, 0.10) 2px,
-      rgba(0, 0, 0, 0.10) 3px
-    );
-    mix-blend-mode: multiply;
+  // The theme numbers/bullets .main-content list items via ::before counters;
+  // the landing's lists carry their own numerals and markers.
+  .stack-grid > li::before,
+  .convictions > li::before,
+  .quickstart-list > li::before {
+    content: none;
   }
 
   .section-header {
@@ -607,17 +600,15 @@ strong, b {
     font-size: 0.75rem;
     letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: var(--neon-purple);
-    opacity: 0.8;
+    color: var(--coral-deep);
     margin-bottom: 0.75rem;
   }
   .section-header h2 {
     font-family: var(--font-heading);
-    font-size: clamp(1.6rem, 3.6cqw, 2.6rem);
-    letter-spacing: 0.06em;
+    font-size: clamp(1.8rem, 3.8cqw, 2.8rem);
+    letter-spacing: 0.14em;
     margin: 0;
-    color: var(--neon-cyan);
-    text-shadow: var(--glow-cyan);
+    color: var(--turquoise-deep);
   }
 
   // 1. INSTALL PROMPT — bare typographic row, no frame ---------------------
@@ -639,15 +630,14 @@ strong, b {
   .install-glyph {
     font-family: var(--font-mono);
     font-size: 1rem;
-    color: var(--neon-cyan);
-    text-shadow: 0 0 6px rgba(0, 240, 255, 0.55);
+    color: var(--turquoise-deep);
     user-select: none;
   }
 
   .install-cmd {
     font-family: var(--font-mono);
     font-size: 1rem;
-    color: var(--text-primary);
+    color: var(--ink);
     background: transparent;
     border: none;
     padding: 0;
@@ -660,11 +650,12 @@ strong, b {
     align-items: center;
     gap: 0.35rem;
     margin-left: 0.35rem;
-    font-family: var(--font-heading);
+    font-family: var(--font-body);
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     font-size: 0.62rem;
-    color: var(--text-muted);
+    color: var(--ink-soft);
     background: transparent;
     border: none;
     border-radius: 0;
@@ -673,39 +664,27 @@ strong, b {
     transition: color 140ms ease, transform 140ms ease;
   }
   .install-copy:hover {
-    color: var(--neon-cyan);
-    text-shadow: 0 0 6px rgba(0, 240, 255, 0.55);
-
-    .install-copy-icon {
-      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.6));
-    }
+    color: var(--turquoise-deep);
   }
   .install-copy.is-copied {
-    color: var(--neon-yellow);
-    text-shadow: 0 0 6px rgba(255, 211, 25, 0.55);
-
-    .install-copy-icon {
-      filter: drop-shadow(0 0 4px rgba(255, 211, 25, 0.6));
-    }
+    color: var(--coral-deep);
   }
 
   .install-copy-icon {
     transition: filter 140ms ease;
   }
 
-  // Terminal window chrome (shared) ----------------------------------------
+  // Terminal window chrome (shared) — the island of night ------------------
   .terminal-window {
     position: relative;
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-dim);
-    border-radius: 4px;
+    background: var(--term-bg);
+    border: 1px solid rgba(20, 56, 63, 0.25);
+    border-radius: 5px;
     overflow: hidden;
-    box-shadow:
-      0 0 0 1px rgba(0, 240, 255, 0.08),
-      0 18px 60px -20px rgba(0, 0, 0, 0.7),
-      0 0 60px -20px rgba(0, 240, 255, 0.35);
+    box-shadow: 0 24px 60px -24px rgba(20, 56, 63, 0.5);
   }
 
+  // CRT scanlines live only on the terminals.
   .terminal-window::after {
     content: "";
     position: absolute;
@@ -722,13 +701,20 @@ strong, b {
     z-index: 3;
   }
 
+  // Titlebar — sunlit plaster with warm louver bands (light through blinds).
   .terminal-titlebar {
     display: flex;
     align-items: center;
     gap: 0.4rem;
     padding: 0.55rem 0.85rem;
-    background: linear-gradient(180deg, #1f1252 0%, #170e3d 100%);
-    border-bottom: 1px solid var(--border-dim);
+    background:
+      repeating-linear-gradient(
+        180deg,
+        rgba(255, 158, 111, 0.18) 0 2px,
+        rgba(255, 158, 111, 0) 2px 6px
+      ),
+      linear-gradient(180deg, #fdfaf3 0%, #f3ecdd 100%);
+    border-bottom: 1px solid rgba(20, 56, 63, 0.15);
     position: relative;
     z-index: 2;
   }
@@ -739,16 +725,16 @@ strong, b {
     border-radius: 50%;
     display: inline-block;
   }
-  .terminal-dot--pink   { background: var(--neon-pink);   box-shadow: 0 0 6px rgba(255, 41, 117, 0.7); }
-  .terminal-dot--yellow { background: var(--neon-yellow); box-shadow: 0 0 6px rgba(255, 211, 25, 0.6); }
-  .terminal-dot--cyan   { background: var(--neon-cyan);   box-shadow: 0 0 6px rgba(0, 240, 255, 0.7); }
+  .terminal-dot--flamingo  { background: var(--flamingo); }
+  .terminal-dot--peach     { background: var(--coral); }
+  .terminal-dot--turquoise { background: var(--turquoise); }
 
   .terminal-title {
     margin-left: 0.6rem;
     font-family: var(--font-mono);
     font-size: 0.78rem;
     letter-spacing: 0.08em;
-    color: var(--text-muted);
+    color: var(--ink-soft);
   }
 
   .terminal-body {
@@ -756,8 +742,8 @@ strong, b {
     position: relative;
     z-index: 2;
     background:
-      radial-gradient(ellipse at 50% 0%, rgba(0, 240, 255, 0.06), transparent 70%),
-      var(--bg-elevated);
+      radial-gradient(ellipse at 50% 0%, rgba(46, 230, 200, 0.06), transparent 70%),
+      var(--term-bg);
   }
 
   .terminal-body pre.tui {
@@ -765,17 +751,14 @@ strong, b {
     font-family: var(--font-mono);
     font-size: 0.86rem;
     line-height: 1.55;
-    color: var(--text-primary);
+    color: var(--term-text);
     white-space: pre;
     overflow-x: auto;
   }
 
-  // 2. SHOWCASE — animated TUI demo ----------------------------------------
+  // 2. SHOWCASE — live demo -------------------------------------------------
   section.landing-showcase {
-    background:
-      radial-gradient(ellipse at 0% 30%, rgba(185, 103, 255, 0.10), transparent 55%),
-      radial-gradient(ellipse at 100% 80%, rgba(0, 240, 255, 0.08), transparent 55%),
-      var(--bg-void);
+    background: var(--stucco);
 
     .showcase-frame {
       position: relative;
@@ -785,7 +768,9 @@ strong, b {
       padding: 0;
       background: transparent;
       border: 0;
-      box-shadow: none;
+      box-shadow: 0 30px 70px -30px rgba(20, 56, 63, 0.45);
+      border-radius: 5px;
+      overflow: hidden;
     }
 
     .showcase-image {
@@ -803,25 +788,24 @@ strong, b {
       max-width: 600px;
       font-family: var(--font-mono);
       font-size: 0.82rem;
-      color: var(--text-muted);
+      color: var(--ink-soft);
       letter-spacing: 0.06em;
       position: relative;
       z-index: 2;
 
       code {
-        color: var(--neon-pink);
+        color: var(--flamingo-deep);
         background: transparent;
         padding: 0;
+        border: none;
       }
     }
   }
 
-  // 3. STACK — feature grid ------------------------------------------------
+  // 3. STACK — feature grid -------------------------------------------------
   section.landing-stack {
-    background:
-      radial-gradient(ellipse at 100% 0%, rgba(255, 41, 117, 0.08), transparent 55%),
-      var(--bg-void);
-    border-top: 1px solid var(--border-dim);
+    background: var(--plaster);
+    border-top: 1px solid var(--sand);
 
     .stack-grid {
       list-style: none;
@@ -838,8 +822,8 @@ strong, b {
     .stack-tile {
       position: relative;
       padding: 1.75rem 1.5rem 1.5rem;
-      background: linear-gradient(160deg, rgba(28, 17, 69, 0.85) 0%, rgba(18, 10, 46, 0.85) 100%);
-      border: 1px solid var(--border-dim);
+      background: var(--stucco);
+      border: 1px solid var(--sand);
       border-radius: 3px;
       transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
     }
@@ -850,50 +834,45 @@ strong, b {
       top: 0;
       left: 0;
       width: 2.5rem;
-      height: 1px;
-      background: var(--neon-cyan);
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.7);
+      height: 3px;
+      background: var(--turquoise);
     }
 
     .stack-tile:nth-child(even)::before {
-      background: var(--neon-pink);
-      box-shadow: 0 0 8px rgba(255, 41, 117, 0.7);
+      background: var(--flamingo);
     }
 
     .stack-tile:hover {
       transform: translateY(-2px);
-      border-color: rgba(0, 240, 255, 0.55);
-      box-shadow:
-        0 0 0 1px rgba(0, 240, 255, 0.15),
-        0 0 32px -8px rgba(0, 240, 255, 0.5);
+      border-color: var(--turquoise);
+      box-shadow: 0 14px 34px -14px rgba(20, 56, 63, 0.3);
     }
 
     .stack-glyph {
       display: inline-block;
       font-family: var(--font-mono);
       font-size: 1.6rem;
-      color: var(--neon-cyan);
-      text-shadow: var(--glow-cyan);
+      color: var(--turquoise-deep);
       margin-bottom: 0.75rem;
       line-height: 1;
     }
     .stack-tile:nth-child(even) .stack-glyph {
-      color: var(--neon-pink);
-      text-shadow: var(--glow-pink);
+      color: var(--flamingo-deep);
     }
 
     .stack-name {
-      font-family: var(--font-heading);
+      font-family: var(--font-body);
+      font-weight: 600;
       font-size: 1.05rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--text-primary);
+      color: var(--ink);
       margin: 0 0 0.5rem 0;
     }
 
     .stack-desc {
       font-family: var(--font-body);
-      color: var(--text-muted);
+      color: var(--ink-soft);
       font-size: 0.92rem;
       line-height: 1.55;
       margin: 0 0 1rem 0;
@@ -901,7 +880,7 @@ strong, b {
       code {
         font-family: var(--font-mono);
         font-size: 0.85em;
-        color: var(--neon-yellow);
+        color: var(--coral-deep);
         background: transparent;
         border: none;
         padding: 0;
@@ -912,23 +891,22 @@ strong, b {
       font-family: var(--font-mono);
       font-size: 0.78rem;
       letter-spacing: 0.1em;
-      color: var(--neon-pink);
+      color: var(--flamingo-deep);
       text-decoration: none;
       text-transform: lowercase;
 
       &:hover {
-        color: #ff5d97;
-        text-shadow: var(--glow-pink);
+        color: var(--flamingo);
       }
     }
   }
 
-  // 4. PHILOSOPHY ----------------------------------------------------------
+  // 4. PHILOSOPHY — convictions in poolside script -------------------------
   section.landing-philosophy {
     padding: 9rem 1.5rem;
     background:
-      radial-gradient(ellipse at 50% 50%, rgba(185, 103, 255, 0.12), transparent 60%),
-      var(--bg-void);
+      radial-gradient(ellipse at 50% 50%, rgba(249, 207, 216, 0.5), transparent 65%),
+      var(--stucco);
     text-align: center;
 
     .convictions {
@@ -942,27 +920,23 @@ strong, b {
 
     .conviction {
       font-family: var(--font-display);
-      font-size: clamp(1.6rem, 4.2cqw, 3.2rem);
-      letter-spacing: 0.06em;
-      line-height: 1.25;
-      color: var(--text-primary);
+      font-size: clamp(1.9rem, 4.6cqw, 3.4rem);
+      letter-spacing: 0;
+      line-height: 1.3;
+      color: var(--ink);
       padding: 1.5rem 0;
       position: relative;
+      text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
     }
 
     .conviction--1 {
-      color: var(--neon-cyan);
-      text-shadow: var(--glow-cyan);
+      color: var(--turquoise-deep);
     }
     .conviction--2 {
-      color: var(--text-primary);
-      text-shadow:
-        0 0 6px rgba(255, 255, 255, 0.4),
-        0 0 18px rgba(185, 103, 255, 0.5);
+      color: var(--ink);
     }
     .conviction--3 {
-      color: var(--neon-pink);
-      text-shadow: var(--glow-pink);
+      color: var(--flamingo-deep);
     }
 
     .conviction + .conviction::before {
@@ -975,8 +949,8 @@ strong, b {
       background: linear-gradient(
         90deg,
         transparent 0%,
-        var(--neon-pink) 30%,
-        var(--neon-cyan) 70%,
+        var(--flamingo) 30%,
+        var(--turquoise) 70%,
         transparent 100%
       );
       opacity: 0.55;
@@ -985,10 +959,8 @@ strong, b {
 
   // 5. QUICKSTART LADDER ---------------------------------------------------
   section.landing-quickstart {
-    background:
-      radial-gradient(ellipse at 0% 100%, rgba(0, 240, 255, 0.08), transparent 55%),
-      var(--bg-void);
-    border-top: 1px solid var(--border-dim);
+    background: var(--stucco);
+    border-top: 1px solid var(--sand);
 
     .quickstart-list {
       list-style: none;
@@ -1010,29 +982,24 @@ strong, b {
       align-items: center;
     }
 
+    // Deco numerals — thin serif, like a hotel floor indicator.
     .quickstart-numeral {
-      font-family: var(--font-display);
-      font-size: 4.2rem;
+      font-family: var(--font-heading);
+      font-size: 4rem;
+      white-space: nowrap;
       line-height: 1;
-      color: transparent;
-      -webkit-text-stroke: 1px var(--neon-pink);
-      text-stroke: 1px var(--neon-pink);
-      opacity: 0.7;
-      text-shadow: 0 0 18px rgba(255, 41, 117, 0.25);
+      color: var(--flamingo);
       letter-spacing: 0.04em;
       text-align: right;
+      text-shadow: 0 2px 0 rgba(255, 255, 255, 0.8);
       user-select: none;
     }
 
     .quickstart-step:nth-child(2) .quickstart-numeral {
-      -webkit-text-stroke-color: var(--neon-cyan);
-      text-stroke-color: var(--neon-cyan);
-      text-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
+      color: var(--turquoise);
     }
     .quickstart-step:nth-child(3) .quickstart-numeral {
-      -webkit-text-stroke-color: var(--neon-purple);
-      text-stroke-color: var(--neon-purple);
-      text-shadow: 0 0 18px rgba(185, 103, 255, 0.3);
+      color: var(--coral);
     }
 
     .quickstart-step:not(:last-child)::after {
@@ -1044,8 +1011,8 @@ strong, b {
       height: 2rem;
       background: repeating-linear-gradient(
         to bottom,
-        var(--neon-cyan) 0,
-        var(--neon-cyan) 4px,
+        var(--turquoise-deep) 0,
+        var(--turquoise-deep) 4px,
         transparent 4px,
         transparent 8px
       );
@@ -1058,7 +1025,7 @@ strong, b {
     }
 
     .tui--cmd .tui-prompt {
-      color: var(--neon-purple);
+      color: var(--term-turquoise);
       margin-right: 0.5rem;
     }
 
@@ -1067,11 +1034,11 @@ strong, b {
       margin: 0.5rem 0 0 0;
       font-family: var(--font-body);
       font-size: 0.92rem;
-      color: var(--text-muted);
+      color: var(--ink-soft);
 
       code {
         font-family: var(--font-mono);
-        color: var(--neon-yellow);
+        color: var(--coral-deep);
         background: transparent;
         border: none;
         padding: 0 0.2em;
@@ -1084,19 +1051,17 @@ strong, b {
     padding: 7rem 1.5rem 3rem;
     text-align: center;
     background:
-      radial-gradient(ellipse at 50% 100%, rgba(255, 41, 117, 0.14), transparent 60%),
-      var(--bg-void);
-    border-top: 1px solid var(--border-dim);
+      linear-gradient(180deg, var(--plaster) 0%, var(--stucco) 100%);
+    border-top: 1px solid var(--sand);
 
     .cta-mark {
       font-family: var(--font-mono);
       font-size: 0.78rem;
       line-height: 1.2;
-      color: var(--neon-pink);
-      opacity: 0.32;
+      color: var(--flamingo-deep);
+      opacity: 0.45;
       margin: 0 auto 2rem;
       letter-spacing: 0.08em;
-      text-shadow: 0 0 12px rgba(255, 41, 117, 0.4);
       display: inline-block;
       text-align: center;
       white-space: pre;
@@ -1104,10 +1069,9 @@ strong, b {
 
     .cta-heading {
       font-family: var(--font-heading);
-      font-size: clamp(1.5rem, 3.6cqw, 2.4rem);
-      letter-spacing: 0.06em;
-      color: var(--neon-cyan);
-      text-shadow: var(--glow-cyan);
+      font-size: clamp(1.7rem, 3.8cqw, 2.6rem);
+      letter-spacing: 0.14em;
+      color: var(--ink);
       margin: 0 0 2rem 0;
     }
 
@@ -1129,22 +1093,21 @@ strong, b {
       font-size: 0.74rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--ink-soft);
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 0.65rem;
       padding-top: 1.5rem;
-      border-top: 1px solid var(--border-dim);
+      border-top: 1px solid var(--sand);
       max-width: 700px;
       margin: 0 auto;
 
       a {
-        color: var(--text-muted);
+        color: var(--ink-soft);
 
         &:hover {
-          color: var(--neon-pink);
-          text-shadow: var(--glow-pink);
+          color: var(--flamingo-deep);
         }
       }
     }
@@ -1160,6 +1123,9 @@ strong, b {
   .btn {
     transition: none;
   }
+  .landing-page .hero-content .hero-alert__cursor {
+    animation: none;
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -1174,12 +1140,15 @@ strong, b {
 
 @media (max-width: 640px) {
   .landing-hero {
-    padding-top: 10vh;
+    padding-top: 8vh;
   }
   .landing-page .hero-content .btn {
     display: block;
     margin: 0.5rem auto;
     max-width: 240px;
+  }
+  .landing-page .hero-horizon {
+    margin-top: 3rem;
   }
 
   .landing-page {
