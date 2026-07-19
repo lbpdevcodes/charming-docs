@@ -122,7 +122,7 @@ Charming.run(MyApp::Application.new)
 
 The runtime:
 
-1. Enters the terminal alternate screen and enables mouse tracking, bracketed paste, and focus reporting
+1. Enters the terminal alternate screen and enables mouse tracking, bracketed paste, and focus reporting (and detects the terminal background for adaptive colors)
 2. Resolves the root route
 3. Dispatches controller actions and events
 4. Renders responses through a renderer
@@ -148,10 +148,17 @@ yourself with `rescue_from` before they reach the runtime.
 
 ### Quitting
 
-`q`-style bindings produce a quit `Response`. The runtime also traps SIGINT and
-treats an *unbound* `ctrl+c` keypress as quit, so apps always have an escape hatch —
-bind `"ctrl+c"` yourself to take it over. On the way out the runtime drains
-background tasks (with a grace period), persists the session when configured, and
-restores the terminal.
+`q`-style bindings produce a quit `Response`. The runtime also traps SIGINT (and
+SIGTERM/SIGHUP) and treats an *unbound* `ctrl+c` keypress as quit, so apps always
+have an escape hatch — bind `"ctrl+c"` yourself to take it over. On the way out the
+runtime drains background tasks (with a grace period), persists the session when
+configured, and restores the terminal. An `at_exit` fallback restores the terminal
+even if the process dies without reaching the normal teardown.
+
+### Suspend and resume
+
+`Ctrl+Z` works like it does in any well-behaved TUI: the runtime returns the
+terminal to its normal state and stops the process; on `fg` it re-enters raw mode
+and the alternate screen and repaints the current route. No app code is needed.
 
 For tests, instantiate `Charming::Runtime` directly with `MemoryBackend`. See [Testing]({{ '/docs/testing/' | relative_url }}).

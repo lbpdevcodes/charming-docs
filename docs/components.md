@@ -44,10 +44,12 @@ Assigns passed to `new` become reader methods:
 |-----------|-------------|
 | `TextInput` | Editable text field. `masked: true` for passwords, `history: [...]` for REPL-style up/down recall, paste support. |
 | `TextArea` | Multiline editor. Plain Enter inserts a newline (`enter_newline: false` to opt out); paste support. |
-| `Form` | Huh-inspired form with input, textarea, select, confirm, and note fields. |
-| `List` | Selectable list with keyboard navigation and mouse support. |
+| `Form` | Huh-inspired form with input, textarea, select, multiselect, confirm, and note fields. |
+| `List` | Selectable list with keyboard navigation, mouse support, and fuzzy filtering (`filter:` / `list.filter = query`). |
 | `MultiSelectList` | List with `[x]` checkboxes — Space toggles, Enter submits the checked set, `max_selections:` caps it. |
-| `Table` | Unicode data table. `height:` adds a scrolling window with page up/down and window-relative clicks. |
+| `Table` | Unicode data table. `height:` adds a scrolling window with page up/down and window-relative clicks; `sort_by!`/`toggle_sort` sort by column with a ▲/▼ header marker. |
+| `Paginator` | Page tracker rendering `○ ● ○` dots or `2/3`; `page_items(items)` slices the current page. |
+| `Filepicker` | Directory browser — Enter descends or selects a file (`[:selected, path]`), Backspace ascends, `toggle_hidden` shows dotfiles. |
 | `Tree` | Collapsible hierarchy — right/left expand/collapse, Enter selects leaves, mouse toggles branches. |
 | `Viewport` | Scrollable container for tall content, with wrapping and horizontal scroll. |
 | `Modal` | Overlay dialog with title, content, help text — `max_body_height:` makes the body scrollable. |
@@ -62,9 +64,11 @@ Assigns passed to `new` become reader methods:
 | `CommandPaletteModal` | Standard modal wrapper for command palette content. |
 | `CommandPalette` | Fuzzy-search command picker used by the framework (and reusable). |
 | `Markdown` | CommonMark/GFM renderer backed by Commonmarker with Rouge syntax highlighting. |
-| `Spinner` | Animated frame-cycling indicator. |
+| `Spinner` | Animated frame-cycling indicator with named presets — `style: :dots`, `:moon`, `:meter`, … |
 | `ActivityIndicator` | Gradient activity bar with label and ellipsis animation. |
-| `Progressbar` | Text-based progress bar. |
+| `Progressbar` | Text-based progress bar. `gradient: ["#a", "#b"]` colors the fill with a sweep; `percent` reports completion. |
+| `Timer` | Countdown clock (`mm:ss`) — `tick` per timer interval, `expired?`, `reset`. |
+| `Stopwatch` | Count-up clock — `start`/`stop`/`reset`, accumulates only while running. |
 | `Audio` | One-line playback-status indicator (`▶`/`■` + label) for a `Charming::Audio::Player`. See [Audio]({{ '/docs/audio/' | relative_url }}). |
 | `ErrorScreen` | The panel the runtime renders for unhandled exceptions (not usually built by hand). |
 | `KeyboardHandler` | Key-mapping mixin for custom components. |
@@ -94,6 +98,18 @@ Charming::Components::Tree.new(nodes: [
 # Password input with shell-style history
 Charming::Components::TextInput.new(masked: true)
 Charming::Components::TextInput.new(history: ["last command", "older command"])
+
+# Spinner presets (drive `tick` from a controller timer)
+Charming::Components::Spinner.new(style: :dots, label: "Fetching")
+
+# Gradient progress
+Charming::Components::Progressbar.new(total: 30, gradient: ["#f43f5e", "#22d3ee"])
+
+# Fuzzy-filtered list (wire the query from a TextInput or palette)
+Charming::Components::List.new(items: commands, filter: "dep")
+
+# File selection
+Charming::Components::Filepicker.new(root: Dir.pwd, height: 12, theme: theme)
 ```
 
 `ActivityIndicator` accepts `max_width:` and `fallback_label:` to keep labeled loading indicators stable in constrained layouts:
@@ -122,7 +138,8 @@ Render Markdown with `Charming::Components::Markdown`:
 
 Markdown parsing is handled by Commonmarker with CommonMark/GFM support. Code block tokenization is handled by Rouge. Charming owns terminal rendering, wrapping, and Glamour-inspired Markdown styling.
 
-The built-in Markdown styles are `:dark`, `:light`, and `:notty`. GFM tables, task lists, strikethrough, autolinks, links, images, definition lists, and footnotes render as terminal-friendly text:
+The built-in Markdown styles are `:dark`, `:light`, `:notty`, and `:auto` — which
+picks dark or light from the detected terminal background. GFM tables, task lists, strikethrough, autolinks, links, images, definition lists, and footnotes render as terminal-friendly text:
 
 - **Definition lists** (`Term` / `: definition`) render bold terms with indented, wrapped descriptions.
 - **Footnotes** render `[name]` references inline and labeled definition blocks with hanging indentation.
@@ -243,6 +260,7 @@ class SignupController < Charming::Controller
       f.input :name, label: "Name", placeholder: "Ada Lovelace", required: true
       f.textarea :bio, label: "Bio", height: 5, placeholder: "Tell us about yourself"
       f.select :plan, label: "Plan", options: ["Free", "Pro", "Team"]
+      f.multiselect :interests, label: "Interests", options: ["TUI", "CLI", "Web"]
       f.confirm :terms, label: "Accept terms?", required: true
       f.note "Enter submits from the last field. Escape cancels."
     end
@@ -261,6 +279,7 @@ Form fields:
 | `input` | Single-line text input. |
 | `textarea` | Multiline text input — Enter inserts a newline (twice for a blank line). |
 | `select` | Single-choice picker (`options:`, `option_label:` for display strings). |
+| `multiselect` | Multiple-choice picker — Space toggles the highlighted option; the checked set (in option order) is the value. `max_selections:` caps it. |
 | `confirm` | Boolean yes/no field. |
 | `note` | Static, non-focusable text. |
 
@@ -272,8 +291,9 @@ Keyboard behavior:
 | `Enter` | In a textarea: insert a newline. Elsewhere: next field, or submit from the last field. |
 | `Ctrl+S` | Submit the form from any field. |
 | `Escape` | Cancel the form. |
-| `Up` / `Down` | Change select choices. |
-| `Space`, `y`, `n` | Toggle or set confirm fields. |
+| `Up` / `Down` | Change select choices / move the multiselect highlight. |
+| `Space` | Toggle the highlighted multiselect option; toggle confirm fields. |
+| `y`, `n` | Set confirm fields. |
 
 This matches charm.sh's huh: a textarea is a text editor, so it owns Enter — leave it
 with Tab and submit with Ctrl+S. (Shift+Enter/Ctrl+J/Ctrl+N also insert newlines, for
@@ -308,4 +328,22 @@ def handle_mouse(event)
 end
 ```
 
-Mouse events expose button, coordinates, modifier flags, and helpers such as `click?`, `scroll?`, and `release?`.
+Mouse events expose button, coordinates, and modifier flags (`ctrl`, `alt`,
+`shift`, decoded from the terminal's button-code bits), plus helpers:
+
+| Helper | True for |
+|--------|----------|
+| `click?` | A left/middle/right button **press** (not a release, drag, or hover). |
+| `release?` | The button coming back up. |
+| `scroll?` | Either wheel direction (`button_name` is `:scroll_up`/`:scroll_down`). |
+| `drag?` | Movement with a button held down. |
+| `motion?` | Any movement report — drag or hover. |
+
+Drag reporting is on by default. Buttonless **hover** motion is opt-in on the
+application class, since it makes the terminal report every mouse movement:
+
+```ruby
+class Application < Charming::Application
+  mouse_motion :all   # :drag is the default
+end
+```

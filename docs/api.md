@@ -51,6 +51,8 @@ Class APIs:
 - `default_theme name` sets the default theme.
 - `theme_for name` resolves a theme object.
 - `persist_session to: "tmp/session.json"` opts into JSON session persistence across restarts (framework-internal keys and non-JSON-safe values are excluded).
+- `coalesce_input true` collapses held-key auto-repeat bursts into one dispatch (off by default).
+- `mouse_motion :all` enables buttonless hover reporting (`:drag`, the default, reports motion only while a button is held).
 - `namespace` returns the application namespace used for controller and template binding lookup.
 
 Instance APIs:
@@ -141,6 +143,7 @@ Instance APIs:
 - `session` accesses the application session.
 - `logger` returns the application logger.
 - `state(name, state_class, **attributes)` stores or returns a session-backed state object.
+- `component_state(name, **defaults)` stores or returns a JSON-safe primitive hash for widget state (cursor, selection, offsets) — seeded from `defaults` on first access; survives `persist_session`.
 - `run_task(name, timeout: nil) { ... }` submits async work; blocks accepting an argument receive a `Tasks::Progress` reporter.
 - `cancel_task(name)` cancels an in-flight task (raises `Tasks::Cancelled` inside it).
 - `params` exposes current route params.
@@ -311,9 +314,9 @@ Bundled components:
 - `Charming::Components::TextInput` — options include `masked:` (password rendering) and `history:` (up/down recall)
 - `Charming::Components::TextArea` — plain Enter inserts a newline by default (`enter_newline: false` to opt out)
 - `Charming::Components::Form`
-- `Charming::Components::List`
+- `Charming::Components::List` — `filter:` / `filter=` narrow items by fuzzy match (best match first)
 - `Charming::Components::MultiSelectList` — `selected_indices:`, `max_selections:`; Space toggles, Enter submits `[:submitted, items]`
-- `Charming::Components::Table` — `height:` adds a scrolling window with page up/down
+- `Charming::Components::Table` — `height:` adds a scrolling window with page up/down; `sort_by!(column, direction:)` / `toggle_sort(column)` sort with a ▲/▼ header marker
 - `Charming::Components::Tree` — collapsible node hashes (`{label:, children:, expanded:}`)
 - `Charming::Components::Viewport`
 - `Charming::Components::Modal` — `max_body_height:` makes the body scrollable; `scroll_offset` exposes the position
@@ -328,8 +331,12 @@ Bundled components:
 - `Charming::Components::CommandPalette`
 - `Charming::Components::CommandPaletteModal`
 - `Charming::Components::Markdown`
-- `Charming::Components::Spinner`
-- `Charming::Components::Progressbar`
+- `Charming::Components::Spinner` — `style:` picks a named preset (`:line`, `:dots`, `:mini_dot`, `:jump`, `:pulse`, `:points`, `:globe`, `:moon`, `:meter`, `:hamburger`, `:ellipsis`); `frames:` overrides
+- `Charming::Components::Progressbar` — `gradient: ["#rrggbb", "#rrggbb"]` colors the fill; `percent` reports completion
+- `Charming::Components::Paginator` — `total:`, `per_page:`, `format:` (`:dots`/`:arabic`); `page_items(items)`, `next_page`/`prev_page`
+- `Charming::Components::Filepicker` — `root:`, `show_hidden:`, `height:`; Enter descends or returns `[:selected, path]`, Backspace ascends, `toggle_hidden`
+- `Charming::Components::Timer` — `duration:`, `label:`; `tick`, `expired?`, `reset`
+- `Charming::Components::Stopwatch` — `label:`; `start`/`stop`/`reset`, `tick` accumulates while running
 - `Charming::Components::ActivityIndicator`
 - `Charming::Components::Audio` — `▶`/`■` playback indicator for a `Charming::Audio::Player` (`player:`, `label:`)
 - `Charming::Components::ErrorScreen` — rendered by the runtime for unhandled exceptions
@@ -405,14 +412,18 @@ For a guided tour of the `Style` builder, colors, and borders, see [Styling]({{ 
 `Charming::UI` provides ANSI-aware layout helpers:
 
 - `Charming::UI.style`
-- `Charming::UI.join_horizontal(*blocks, gap: 0)`
-- `Charming::UI.join_vertical(*blocks, gap: 0)`
+- `Charming::UI.adaptive(light:, dark:)` — a color resolved against the terminal background at render time
+- `Charming::UI.join_horizontal(*blocks, gap: 0, align: :top)` — `align:` is `:top`/`:center`/`:bottom` or a 0.0–1.0 fraction
+- `Charming::UI.join_vertical(*blocks, gap: 0, align: :left)` — pads narrower blocks to the widest; `align:` is `:left`/`:center`/`:right` or a fraction
 - `Charming::UI.center(block, width:, height:)`
-- `Charming::UI.place(block, width:, height:, top: 0, left: 0, background: nil)`
+- `Charming::UI.place(block, width:, height:, top: 0, left: 0, background: nil)` — positions take integers, `:center`, or fractions
 - `Charming::UI.overlay(base, overlay, top: :center, left: :center)`
 - `Charming::UI.visible_slice(line, start_column, width)`
-- `Charming::UI::Width.measure(value)`
+- `Charming::UI::Width.measure(value)` / `pad_to(line, width)` / `widest(lines)`
 - `Charming::UI::Width.strip_ansi(value)`
+- `Charming::UI::Truncate.tail(text, width, ellipsis: "…")`
+- `Charming::UI::TextWrapper.new(width:).wrap(value)`
+- `Charming::UI::Gradient.blend(from, to, amount)` / `steps(from, to, count)` / `colorize(text, from:, to:)`
 
 Color capability (`Charming::UI::ColorSupport`):
 
@@ -420,6 +431,11 @@ Color capability (`Charming::UI::ColorSupport`):
 - `level = value` — force a level; `nil` re-enables detection.
 - `at_least?(:color256)` — capability comparison.
 - Hex colors in styles and themes downconvert automatically to the active level.
+
+Terminal background (`Charming::UI::Background`):
+
+- `dark?` — whether the background is dark (OSC 11 query at runtime startup, `COLORFGBG` fallback, dark default).
+- `assume = :dark | :light | nil` — override or re-enable detection.
 
 Styles are immutable builders:
 
@@ -432,11 +448,11 @@ Common style methods:
 - `foreground` / `fg`
 - `background` / `bg`
 - `bold`, `faint`, `italic`, `underline`, `reverse`, `strikethrough`
-- `padding`
-- `border`
-- `width`
-- `height`
-- `align`
+- `padding`, `margin` (CSS shorthand; per-side setters like `padding_left`, `margin_top`)
+- `border(style, sides:, foreground:, background:)` — style name or a custom `UI::Border`; `foreground:` takes a color or per-side hash
+- `width`, `height`, `max_width`, `max_height`
+- `align`, `align_vertical`
+- `wrap`, `truncate(ellipsis: "…")` — overflow fit modes at a fixed width (default is clip)
 - `render(value)`
 
 ## Themes
@@ -459,7 +475,7 @@ Runtime events include:
 
 - `Charming::Events::KeyEvent` — `key`, `char`, `ctrl`, `alt`, `shift`
 - `Charming::Events::ResizeEvent` — `width`, `height`
-- `Charming::Events::MouseEvent` — `button`, `x`, `y`, modifiers, `click?`/`scroll?`/`release?`
+- `Charming::Events::MouseEvent` — `button`, `x`, `y`, modifiers (`ctrl`/`alt`/`shift`), `click?`/`scroll?`/`release?`/`drag?`/`motion?` (hover motion requires `mouse_motion :all` on the application)
 - `Charming::Events::TimerEvent` — `name`, `now`
 - `Charming::Events::TaskEvent` — `name`, `value`, `error`, `error?`
 - `Charming::Events::TaskProgressEvent` — `name`, `current`, `total`, `message`, `fraction`

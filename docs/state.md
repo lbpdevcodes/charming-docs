@@ -91,6 +91,31 @@ def save
 end
 ```
 
+## Component State
+
+Interactive widgets need state that outlives one event — a cursor position, a
+scroll offset, an expanded-node set. The idiom is `component_state`: a JSON-safe
+primitive hash in the session that you rebuild the component from each event and
+write changed values back to after `handle_key`:
+
+```ruby
+def show
+  query = component_state(:query, value: "", cursor: 0)   # seeded on first access
+  input = Charming::Components::TextInput.new(value: query[:value], cursor: query[:cursor])
+  input.handle_key(event) if event
+  query[:value] = input.value                             # write changes back
+  query[:cursor] = input.cursor
+  render "query: #{query[:value]}"
+end
+```
+
+The command palette, forms, focus, and sidebar all work this way, and these hashes
+survive `persist_session`. Do **not** store live component objects (`TextInput`,
+`List`, …) in the session — they are silently dropped on persist; their mutable
+state belongs in a `component_state` hash. (The exception is runtime engine handles
+like `session[:audio] ||= Charming::Audio::Player.new`, which wrap a live process
+and are intentionally dropped by `save_session`.)
+
 ## Form State
 
 Use `Controller#form` for session-backed terminal forms. Charming stores only primitive form data under `session[:forms]`, then rebuilds form components on each dispatch.

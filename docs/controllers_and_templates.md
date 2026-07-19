@@ -156,6 +156,11 @@ key "q", :quit, scope: :global
 
 Content-scoped bindings only run when content focus is active. Global bindings run from any focused pane.
 
+Bindings compose modifiers with `+` — `ctrl+s`, `alt+b`, `shift+up`,
+`ctrl+shift+left` — and the input layer decodes them from the terminal's escape
+sequences (xterm modifier parameters for arrows/home/end/F-keys, ESC-prefixed
+chords for `alt+letter`), so modified bindings work across modern terminals.
+
 ### Dispatch priority
 
 Key events flow through this chain, first match wins:
