@@ -372,14 +372,6 @@ strong, b {
   padding: 0;
 }
 
-// The folded docs index ({{ content }}) is ordinary docs prose — re-constrain it
-// to a readable column and restore padding, since the wrapper above stripped it.
-.landing-docs {
-  max-width: 50rem;
-  margin: 0 auto;
-  padding: 4rem 1.5rem 5rem;
-}
-
 .landing-main {
   position: relative;
   width: 100%;
