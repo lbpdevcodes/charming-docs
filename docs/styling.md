@@ -239,5 +239,5 @@ All of the above measure **display width**, not character count, via
 emoji content. You rarely call it directly, but it is why a styled, emoji-laden row
 still lines up.
 
-For the compact method-by-method reference, see the
-[API Reference]({{ '/docs/api/' | relative_url }}#ui).
+For the compact method-by-method reference, see
+[UI & Themes]({{ '/docs/api/ui/' | relative_url }}) in the API Reference.
