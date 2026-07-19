@@ -117,7 +117,8 @@ Class APIs:
 - `key name, action, scope: :content` binds a content-pane key to an action.
 - `key name, action, scope: :global` binds an app-level shortcut.
 - `command label, action = nil, &block` adds a command palette item.
-- `timer name, every:, action:` dispatches a periodic timer while the route is active (`every:` must be positive).
+- `timer name, every:, action:, autostart: true` dispatches a periodic timer while the route is active (`every:` must be positive; `autostart: false` waits for `start_timer`).
+- `animate name, fps:, action:` declares a stopped animation timer ticking at *fps* frames per second (start it with `start_timer`).
 - `on_task name, action:` handles async task completion.
 - `on_task_progress name, action:` handles `progress.report` calls from a running task.
 - `before_action method, only: nil, except: nil` runs a hook before matching actions.
@@ -146,6 +147,7 @@ Instance APIs:
 - `component_state(name, **defaults)` stores or returns a JSON-safe primitive hash for widget state (cursor, selection, offsets) — seeded from `defaults` on first access; survives `persist_session`.
 - `run_task(name, timeout: nil) { ... }` submits async work; blocks accepting an argument receive a `Tasks::Progress` reporter.
 - `cancel_task(name)` cancels an in-flight task (raises `Tasks::Cancelled` inside it).
+- `start_timer(name)`, `stop_timer(name)`, and `timer_running?(name)` control declared timers at runtime (unknown names raise `ArgumentError`; both mutators are idempotent).
 - `params` exposes current route params.
 - `event` exposes the current key, timer, task, progress, resize, mouse, or paste event.
 - `screen` exposes terminal dimensions.
@@ -492,6 +494,18 @@ Use `Charming.key_of(event)` when component code needs the normalized key symbol
 - `Charming::Tasks::Cancelled` — raised inside a task by `cancel_task` or a `timeout:`; arrives as the `TaskEvent#error`.
 
 Custom executors implement `submit(name, timeout: nil, &block)` (plain `submit(name, &block)` works until timeouts are used), plus optional `cancel(name)` and `shutdown(timeout:)`.
+
+## Animation
+
+Physics primitives for spring and projectile motion — see [Animation]({{ '/docs/animation/' | relative_url }}) for the full guide.
+
+- `Charming.fps(n)` — the seconds-per-frame delta for a frame rate (`1.0 / n`).
+- `Charming::Spring.new(delta_time:, angular_frequency: 6.0, damping_ratio: 0.5)` — immutable damped harmonic oscillator with precomputed coefficients.
+- `Spring#update(position, velocity, target)` — returns `[new_position, new_velocity]` advanced one frame.
+- `Spring#settled?(position, velocity, target, epsilon: 0.01)` — true once motion is effectively at rest (the `stop_timer` guard).
+- `Charming::Projectile.new(delta_time:, position:, velocity:, acceleration:)` — mutable semi-implicit Euler motion; `#update` advances one frame and returns the new `Point`; readers `position`, `velocity`, `acceleration`.
+- `Charming::Projectile::Point` / `Vector` — `x:`, `y:`, optional `z:` (default `0.0`).
+- `Charming::Projectile::TERMINAL_GRAVITY` (top-left origin) and `GRAVITY` (bottom-left origin).
 
 ## Audio
 

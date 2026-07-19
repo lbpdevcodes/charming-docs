@@ -229,6 +229,12 @@ runtime.run
 
 This avoids sleeps and makes timer behavior deterministic.
 
+For animation timers ([Animation]({{ '/docs/animation/' | relative_url }})), an
+incrementing clock (`t = 0.0; clock = -> { t += 1.0 / 120 }`) is easier than a
+scripted array. To prove an animation stops itself, follow the motion with
+`nil` input events while the clock keeps advancing — `backend.frames` must gain
+no new frames after the settle frame.
+
 ## Task Specs
 
 Use the inline task executor for deterministic async task tests — it runs blocks

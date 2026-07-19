@@ -14,7 +14,8 @@ come in two kinds:
   mouse events, and report back through return values — a `List` you arrow
   through, a `TextInput` you type into, a `Form` you submit.
 - **Static renderables** just draw — a `Badge`, a `Sparkline`, a `StatusBar`.
-  Some animate when you drive them from a timer (`Spinner`, `Progressbar`).
+  Some animate when you drive them from a timer (`Spinner`, `Progressbar`) —
+  for physics-based motion, see [Animation]({{ '/docs/animation/' | relative_url }}).
 
 Every component inherits from `Charming::Component`, so assigns passed to
 `new` become reader methods and `render` can use the view DSL. Render any of

@@ -251,6 +251,13 @@ end
 `every:` must be positive — a zero or negative interval raises `ArgumentError` at
 declaration time (it would busy-loop the runtime).
 
+Timers run from boot by default. Declare `timer ..., autostart: false` to
+schedule one only when an action asks for it, and control it with the instance
+helpers `start_timer(:name)`, `stop_timer(:name)`, and `timer_running?(:name)`
+(all idempotent). `animate name, fps:, action:` is shorthand for a stopped timer
+ticking at a frame rate — see [Animation]({{ '/docs/animation/' | relative_url }})
+for the physics primitives built on it.
+
 ## Terminal Focus
 
 When the terminal window gains or loses focus, the runtime dispatches an optional
@@ -276,7 +283,9 @@ end
 ```
 
 `event.focused?` is `true` on focus gain and `false` on blur. Controllers that don't
-define `focus_changed` simply ignore the event.
+define `focus_changed` simply ignore the event. For a timer that should stop
+entirely while blurred (rather than tick and skip work), call
+`stop_timer(:clock)` on blur and `start_timer(:clock)` on focus gain.
 
 ## Background Tasks
 
