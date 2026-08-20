@@ -176,6 +176,25 @@ view = MyApp::HomeView.new(
 expect(view.render).to include("Home")
 ```
 
+Rendering is pure: a view's `screen_layout` does not mutate the controller.
+It returns registration data instead — the focusable pane names and mouse
+targets the frame implies. Use `render_view` from `Charming::TestHelper` to
+assert on the frame and the registrations together, with no controller:
+
+```ruby
+include Charming::TestHelper
+
+result = render_view(MyApp::HomeView, screen: Charming::Screen.new(width: 40, height: 10))
+
+expect(result[:frame]).to include("Home")
+expect(result[:focus_slots]).to eq([:entries])
+expect(result[:mouse_targets].map { |target| target[:name] }).to eq([:entries])
+```
+
+The runtime commits these registrations when the response paints. A dispatch
+that raises mid-render commits nothing — the previous frame's focus and mouse
+registrations stay live.
+
 ## Component Specs
 
 Render components directly:
