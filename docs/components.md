@@ -29,12 +29,60 @@ them from a template or view with `render_component`:
 ) %>
 ```
 
-One rule underlies everything: **components have no lifecycle**. Keep a
-component with interaction state in a memoized controller ivar, where it lives
-for the screen's lifetime. Anything that must survive navigation (a selected
-index, a filter query, text in a field) lives in controller
+One rule underlies everything: **components have no lifecycle**. Declare each
+interactive component with the controller's `slot` DSL, where it lives for the
+screen's lifetime. Anything that must survive navigation (a selected index, a
+filter query, text in a field) lives in controller
 [state]({{ '/docs/state/' | relative_url }}) or `session` and gets passed back
-in through the constructor. Each component page shows this idiom.
+in through the factory. Each component page shows this idiom.
+
+## Declared slots
+
+Declare an interactive component once, at the class level:
+
+```ruby
+class SearchController < ApplicationController
+  slot :query   { Charming::Components::TextInput.new(placeholder: "Search…") }
+  slot :results { Charming::Components::List.new(items: []) }
+
+  on_submit :query, :run_search
+end
+```
+
+The `slot` declaration does three jobs. It memoizes the component for the
+screen's lifetime, so interaction state (selection, scroll, cursor) survives
+across events. It defines a private reader with the slot's name, so actions
+and views can call `results`. And it feeds the default focus ring: with no
+explicit `focus_ring`, Tab cycles the declared slots in declaration order. An
+explicit `focus_ring` still wins, and may name layout panes that have no
+component (like `:sidebar`).
+
+The factory block runs against the controller instance, so it can read
+`params`, `state`, and `theme`.
+
+Refresh a memoized component's data in the action, before render. The
+component keeps its interaction state; the data setter reclamps the selection:
+
+```ruby
+def show
+  results.items = Entry.recent_first.to_a
+  render :show, results: results
+end
+```
+
+`List#items=`, `Table#rows=`, `Tree#nodes=`, `TabBar#tabs=`,
+`Autocomplete#suggestions=`, and `MultiSelectList#items=` all work this way.
+
+Two exceptions rebuild per dispatch instead of memoizing: **forms** (declare a
+plain method that calls `form(:name)`) and **per-model modal components** built
+from the record under review. Both capture values that change between
+dispatches, so they stay methods.
+
+The old private-method convention still resolves but warns once per slot.
+Declare the slot to silence it; the convention is removed at 1.0. A focusable
+layout pane that nothing declares — no `slot`, no `focus_ring` entry, no
+same-named method — raises `Charming::UnknownSlot` in development and test.
+
 
 ## Pickers & navigation
 
