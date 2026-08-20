@@ -53,6 +53,8 @@ Assigns passed to `render` become methods in the view. In `home: home`, the left
 render :show, home: home, palette: command_palette
 ```
 
+One dispatch sets the response once. `render`, `render_view`, `render_template`, `navigate`, and `quit` all assign the response. A second call in the same dispatch raises `Charming::DoubleRenderError`. The message names the action, the response already set, and the one attempted. If you see this error, delete the first call — it never painted.
+
 ```ruby
 module MyApp
   module Home
