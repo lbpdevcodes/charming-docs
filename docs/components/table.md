@@ -7,7 +7,7 @@ permalink: /docs/components/table/
 ---
 # Table
 
-`Charming::Components::Table` renders tabular data with unicode borders (via tty-table), a highlighted selected row, keyboard navigation, sorting, and mouse click selection. It is interactive — give it a focus slot when the user should navigate rows. Reach for it when data has columns; for a flat pick-one list use [List]({{ '/docs/components/list/' | relative_url }}).
+`Charming::Components::Table` renders tabular data with unicode borders, a highlighted selected row, keyboard navigation, sorting, and mouse click selection. It is interactive — give it a focus slot when the user should navigate rows. Reach for it when data has columns; for a flat pick-one list use [List]({{ '/docs/components/list/' | relative_url }}).
 
 ```text
 ┌─────────┬───────┐
