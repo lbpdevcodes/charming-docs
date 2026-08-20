@@ -142,16 +142,22 @@ same-named method — raises `Charming::UnknownSlot` in development and test.
 
 ## How components talk to controllers
 
-Interactive components return values from `handle_key` / `handle_mouse`, and
-the runtime dispatches them to controller actions declared for the focus slot:
+Interactive components return `Charming::Components::Result` objects from
+`handle_key` / `handle_mouse`, and the runtime dispatches them to controller
+actions declared for the focus slot:
 
 | Return value | Controller action |
 |--------------|-------------------|
-| `:handled` | — (event consumed) |
-| `[:selected, object]` | declared with `on_select :slot, :action` — the action receives the object |
-| `[:submitted, value]` | declared with `on_submit :slot, :action` — the action receives the value |
-| `:cancelled` | declared with `on_cancel :slot, :action` — no arguments |
+| `Result.handled` | — (event consumed) |
+| `Result.selected(object)` | declared with `on_select :slot, :action` — the action receives the object |
+| `Result.submitted(value)` | declared with `on_submit :slot, :action` — the action receives the value |
+| `Result.cancelled` | declared with `on_cancel :slot, :action` — no arguments |
 | `nil` | — (event falls through) |
+
+The legacy forms (`:handled`, `[:selected, object]`, `[:submitted, value]`,
+`:cancelled`) still work in components you wrote before this release — the
+dispatch pipeline normalizes them to `Result` with no deprecation. New code
+returns `Result`.
 
 The full protocol — key handling, text capture, paste, mouse events, theming —
 lives in [Build Your Own]({{ '/docs/components/build-your-own/' | relative_url }}),

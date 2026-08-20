@@ -68,23 +68,29 @@ def handle_key(event)
   case Charming.key_of(event)
   when :up then move_up
   when :down then move_down
-  when :enter then return [:selected, selected_item]
-  when :escape then return :cancelled
+  when :enter then return Result.selected(selected_item)
+  when :escape then return Result.cancelled
   else return nil
   end
-  :handled
+  Result.handled
 end
 ```
 
-The return value is a protocol the controller understands:
+The return value is a `Charming::Components::Result` — a protocol the
+controller understands:
 
 | Return value | Meaning | Controller action dispatched |
 |--------------|---------|------------------------------|
-| `:handled` | The component consumed the event. | none — the screen re-renders |
-| `[:selected, object]` | The user selected an item. | declared with `on_select :slot, :action` — the action receives the object |
-| `[:submitted, value]` | The user submitted a value. | declared with `on_submit :slot, :action` — the action receives the value |
-| `:cancelled` | The user cancelled the interaction. | declared with `on_cancel :slot, :action` — the action takes no arguments |
+| `Result.handled` | The component consumed the event. | none — the screen re-renders |
+| `Result.selected(object)` | The user selected an item. | declared with `on_select :slot, :action` — the action receives the object |
+| `Result.submitted(value)` | The user submitted a value. | declared with `on_submit :slot, :action` — the action receives the value |
+| `Result.cancelled` | The user cancelled the interaction. | declared with `on_cancel :slot, :action` — the action takes no arguments |
 | `nil` | The component did not handle the event. | none — dispatch continues |
+
+`Result.changed(value)` is reserved for a future `on_change` DSL; nothing
+consumes it yet. The legacy forms (`:handled`, `[:selected, object]`,
+`[:submitted, value]`, `:cancelled`) still dispatch — the pipeline normalizes
+them to `Result` — but new components return `Result`.
 
 Dispatch works through focus: when no higher-priority handler consumes a key,
 the controller builds the component for the focused slot (by calling the

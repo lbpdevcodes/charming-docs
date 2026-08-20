@@ -84,7 +84,7 @@ An empty value shows all suggestions (up to the cap); otherwise matches are the 
 
 ## What it returns
 
-`handle_key` returns `[:submitted, value]` on Enter (value is the highlighted suggestion, falling back to the typed text when no suggestion matches), `:cancelled` on Escape, `:handled` for consumed keys, and `nil` otherwise. On a focus slot these dispatch the actions declared with `on_submit` and `on_cancel`. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
+`handle_key` returns `Result.submitted(value)` on Enter (value is the highlighted suggestion, falling back to the typed text when no suggestion matches), `Result.cancelled` on Escape, `Result.handled` for consumed keys, and `nil` otherwise. On a focus slot these dispatch the actions declared with `on_submit` and `on_cancel`. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
 
 ## Working with it
 

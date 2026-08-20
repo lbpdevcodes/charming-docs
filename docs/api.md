@@ -9,6 +9,8 @@ permalink: /docs/api/
 
 This is the reference for Charming's current public API. Prefer these APIs in app code. Classes under `Charming::Internal` are runtime internals and are documented mainly for testing.
 
+[API Stability]({{ '/docs/api/stability/' | relative_url }}) defines the 1.0 freeze contract: what semver covers, and what stays unversioned.
+
 The reference is organized to follow the shape of an app — from the application object down to the pieces it renders:
 
 - [Application & Configuration]({{ '/docs/api/application/' | relative_url }}) — the `Charming::Application` class, environment, and the `Charming.run` entrypoint.

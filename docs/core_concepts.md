@@ -74,7 +74,7 @@ end
 
 ### The three state lifetimes
 
-1. **Screen-lifetime state goes in ivars.** Components with interaction state belong in memoized ivars: `@query ||= Components::TextInput.new(...)`. They die with the screen. Data-bound components need both halves: memoize the component so its interaction state (selection, scroll) survives, and refresh its data on render — `list.items = rows` or `table.rows = rows`.
+1. **Screen-lifetime state goes in ivars.** Interactive components belong in declared slots: `slot :query { Components::TextInput.new(...) }`. They die with the screen. Data-bound components need both halves: declare the slot so its interaction state (selection, scroll) survives, and refresh its data on render — `list.items = rows` or `table.rows = rows`.
 2. **App-lifetime state goes in state objects.** `Controller#state` stores the object in the application session. It survives navigation:
 
 ```ruby
@@ -90,7 +90,11 @@ def counter
 end
 ```
 
-3. **Restart-lifetime state goes in the persisted session.** `persist_session` writes the session as JSON on quit and restores it on boot. Only JSON-safe values survive.
+3. **Restart-lifetime state goes in the persisted session.** `persist_session` writes the session as JSON on quit and restores it on boot. State objects persist the attributes they mark with `persist`; other JSON-safe session values pass through.
+
+### Background tasks
+
+Task blocks run on an executor thread, not the loop thread. They receive data in via `run_task`'s `with:` and return data out as the block value. The `on_task` handler on the loop thread is the only place task results become state.
 
 ## Views And Layouts
 
