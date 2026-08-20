@@ -17,19 +17,19 @@ The `|` is the rendered cursor marker. When the value is empty, the placeholder 
 
 ## Quick start
 
-Components are rebuilt on every event, so persist the value and cursor in a `component_state` hash and rebuild from it. Expose the component from a memoized method named after a `focus_ring` slot; the framework dispatches keys to it and maps its results to `<slot>_*` hooks.
+Controllers live for the screen's lifetime, so keep the component in a memoized ivar exposed from a method named after a `focus_ring` slot; the framework dispatches keys to it and maps its results to actions declared with `on_submit`/`on_select`/`on_cancel`.
 
 ```ruby
 class SearchController < Charming::Controller
   focus_ring :query
 
+  on_submit :query, :run_search
+
   def show
-    query_state[:value] = query.value      # write changes back after handle_key
-    query_state[:cursor] = query.cursor
     render :show, query: query
   end
 
-  def query_submitted(value)               # Enter pressed in the field
+  def run_search(value)                    # Enter pressed in the field
     session[:last_search] = value
     show
   end
@@ -37,15 +37,7 @@ class SearchController < Charming::Controller
   private
 
   def query
-    @query ||= Charming::Components::TextInput.new(
-      value: query_state[:value],
-      cursor: query_state[:cursor],
-      placeholder: "Search…"
-    )
-  end
-
-  def query_state
-    component_state(:query, value: "", cursor: 0)   # seeded on first access
+    @query ||= Charming::Components::TextInput.new(placeholder: "Search…")
   end
 end
 ```
@@ -79,7 +71,7 @@ end
 
 ## What it returns
 
-`handle_key` returns `[:submitted, value]` on Enter, `:handled` for consumed edits, and `nil` for keys it doesn't understand (which then fall through to your key bindings). On a focus slot, `[:submitted, value]` invokes `<slot>_submitted(value)` on the controller. There is no cancel path — bind Escape yourself if you need one. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
+`handle_key` returns `[:submitted, value]` on Enter, `:handled` for consumed edits, and `nil` for keys it doesn't understand (which then fall through to your key bindings). On a focus slot, `[:submitted, value]` dispatches the action declared with `on_submit :slot, :action` — the action receives the value. There is no cancel path — bind Escape yourself if you need one. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
 
 ## Pasting
 
@@ -87,12 +79,12 @@ The runtime enables bracketed paste, so pasted text arrives as one `Charming::Ev
 
 ## Working with it
 
-- `value` / `cursor` — readers for the current text and cursor offset; read them after dispatch to persist state.
+- `value` / `cursor` — readers for the current text and cursor offset; the memoized component keeps them current across events.
 - `handle_key(event)` / `handle_paste(event)` — usually called for you by focus dispatch.
 - `captures_text?` — returns true; this is what puts the field ahead of key bindings.
 
 ## Tips
 
-- Don't store the component itself in the session — live component objects are dropped on persist. Store `value`/`cursor` primitives and rebuild each event (the quick-start idiom above).
+- Don't store the component itself in the session — live component objects are dropped on persist. The memoized ivar covers the screen's lifetime; for text that must survive navigation, write `value`/`cursor` primitives into a `state` object and seed the constructor from them.
 - `history:` gives REPL-style recall: `↑` steps back (saving your in-progress draft), `↓` steps forward, and stepping past the newest entry restores the draft. Recalled values move the cursor to the end.
 - Enter always submits — there is no way to type a newline. Reach for [TextArea]({{ '/docs/components/text-area/' | relative_url }}) when you need multiline text.

@@ -66,7 +66,7 @@ screen_layout(background: theme.background) do
 end
 ```
 
-The controller routes keys to it by pushing a focus scope while it is open: `focus.push_scope([:delete_confirm], origin: :modal)`, and pops the scope when the `delete_confirm_submitted` / `delete_confirm_cancelled` hooks fire.
+The controller routes keys to it by pushing a focus scope while it is open: `focus.push_scope([:delete_confirm], origin: :modal)`, and pops the scope in the actions declared for the slot (`on_submit :delete_confirm, :delete_entry` / `on_cancel :delete_confirm, :cancel_delete`).
 
 ## Options
 
@@ -103,6 +103,6 @@ When the body fits (or no `max_body_height:` was given), `handle_key` returns `n
 
 ## Tips
 
-- Components are rebuilt on every event, so a scroll position does not survive on its own. Read `modal.scroll_offset` after dispatching a key, stash it in `session`, and pass it back as `scroll_offset:` when you rebuild the modal.
+- A scroll position does not survive a rebuild on its own. Memoize the modal in an ivar, or read `modal.scroll_offset` after dispatching a key, stash it in `session`, and pass it back as `scroll_offset:` when you rebuild the modal.
 - The `help:` line renders as a footer below the body — the stacking order is title, content, help. It stays put when a `max_body_height:` body scrolls.
 - `style:` replaces `theme.modal` wholesale; set your own border, padding, and width on it if you use it.

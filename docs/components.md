@@ -29,8 +29,9 @@ them from a template or view with `render_component`:
 ) %>
 ```
 
-One rule underlies everything: **components are rebuilt on every event**. They
-hold no state of their own between keystrokes — anything durable (a selected
+One rule underlies everything: **components have no lifecycle**. Keep a
+component with interaction state in a memoized controller ivar, where it lives
+for the screen's lifetime. Anything that must survive navigation (a selected
 index, a filter query, text in a field) lives in controller
 [state]({{ '/docs/state/' | relative_url }}) or `session` and gets passed back
 in through the constructor. Each component page shows this idiom.
@@ -94,14 +95,14 @@ in through the constructor. Each component page shows this idiom.
 ## How components talk to controllers
 
 Interactive components return values from `handle_key` / `handle_mouse`, and
-the runtime translates them into controller hooks named after the focus slot:
+the runtime dispatches them to controller actions declared for the focus slot:
 
-| Return value | Controller hook |
-|--------------|-----------------|
+| Return value | Controller action |
+|--------------|-------------------|
 | `:handled` | — (event consumed) |
-| `[:selected, object]` | `<slot>_selected(object)` |
-| `[:submitted, value]` | `<slot>_submitted(value)` |
-| `:cancelled` | `<slot>_cancelled` |
+| `[:selected, object]` | declared with `on_select :slot, :action` — the action receives the object |
+| `[:submitted, value]` | declared with `on_submit :slot, :action` — the action receives the value |
+| `:cancelled` | declared with `on_cancel :slot, :action` — no arguments |
 | `nil` | — (event falls through) |
 
 The full protocol — key handling, text capture, paste, mouse events, theming —

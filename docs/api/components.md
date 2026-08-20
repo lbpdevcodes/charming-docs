@@ -49,13 +49,15 @@ end
 - `:cancelled` means the interaction was cancelled.
 - `nil` means the event was not handled.
 
-### Focused component result hooks
+### Focused component result declarations
 
-When a focus-ring slot's component returns one of the conventional results, the controller calls a matching hook if you define one:
+When a focus-ring slot's component returns one of the conventional results, the controller dispatches the action declared for that slot:
 
-- `[:submitted, values]` calls `<focus_slot>_submitted(values)` when defined.
-- `[:selected, value]` calls `<focus_slot>_selected(value)` when defined.
-- `:cancelled` calls `<focus_slot>_cancelled` when defined.
+- `[:submitted, values]` dispatches the `on_submit :slot, :action` declaration with the values.
+- `[:selected, value]` dispatches the `on_select :slot, :action` declaration with the value.
+- `:cancelled` dispatches the `on_cancel :slot, :action` declaration with no arguments.
+
+The deprecated `<focus_slot>_submitted(values)` naming convention still works but warns once per call site. A result with no handler raises `Charming::UnhandledComponentEvent` in development and test; production logs a warning and falls back to the default render.
 
 ## Bundled components
 
@@ -115,7 +117,7 @@ ActivityIndicator constructor options include `width:`, `label:`, `index:`, `see
 Form component constructor:
 
 - `fields:` array of form field objects.
-- `state:` mutable primitive state hash, usually from `session[:forms]`.
+- `state:` mutable primitive state hash, usually the form's slot in the controller's `form_states`.
 - `theme:` optional `Charming::UI::Theme`.
 
 Form field classes:

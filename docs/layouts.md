@@ -220,7 +220,8 @@ same slots used by Tab traversal:
   click-to-focus for free.
 - If a method named after the slot returns a component that implements
   `handle_mouse(event)`, that component receives the event with pane-local
-  coordinates, and its return value maps to the slot's hooks (`<slot>_selected`, etc.).
+  coordinates, and its return value maps to the actions declared for the slot
+  (`on_select`, etc.).
 
 ```ruby
 screen_layout do

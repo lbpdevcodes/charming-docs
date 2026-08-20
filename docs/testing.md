@@ -43,20 +43,20 @@ RSpec.describe MyApp::EntriesController do
   include Charming::TestHelper
 
   let(:app) { MyApp::Application.new }
+  let(:ctrl) { build_controller(described_class, app: app) }
 
   it "renders the list" do
-    response = build_controller(described_class, app: app).dispatch(:show)
-    expect(response).to render_text("Entries")
+    expect(ctrl.dispatch(:show)).to render_text("Entries")
   end
 
   it "navigates to compose on n" do
-    build_controller(described_class, app: app).dispatch(:show)
-    expect(press(described_class, "n", app: app)).to navigate_to("/compose")
+    ctrl.dispatch(:show)
+    expect(press(ctrl, "n")).to navigate_to(:compose)
   end
 
   it "deletes through the confirm modal" do
-    build_controller(described_class, app: app).dispatch(:show)
-    press_sequence(described_class, %w[d y], app: app)
+    ctrl.dispatch(:show)
+    press_sequence(ctrl, %w[d y])
     expect(Entry.count).to eq(0)
   end
 end
@@ -66,10 +66,10 @@ Helpers:
 
 | Helper | Purpose |
 |--------|---------|
-| `build_controller(klass, app:, screen:, route:, event:)` | Controller wired to an app (defaults: fresh `Application`, 80×24 screen). |
+| `build_controller(klass, app:, screen:, route:, params:)` | One controller instance wired to an app, with `screen_entered` run (defaults: fresh `Application`, 80×24 screen). |
 | `key_event("ctrl+p")` | Build a `KeyEvent` from a human-readable string (`"q"`, `"down"`, `"shift+tab"`). |
-| `press(klass, "q", app:)` | Dispatch one key press; returns the `Response`. |
-| `press_sequence(klass, %w[down down enter], app:)` | Dispatch several presses through fresh controllers sharing the app session (mirrors the runtime). |
+| `press(ctrl, "q")` | Dispatch one key press at the instance; returns the `Response`. |
+| `press_sequence(ctrl, %w[down down enter])` | Dispatch several presses at the same instance (mirrors the runtime's persistent controller). |
 | `memory_backend("up", "q", width: 80, height: 24)` | A `MemoryBackend` pre-seeded with parsed key events, ready for `Charming::Runtime`. |
 
 Matchers:
@@ -78,7 +78,7 @@ Matchers:
 |---------|---------|
 | `render_text("Hello")` | The response body includes the text — compared **ANSI-stripped**, so styled output that interleaves escape codes mid-phrase still matches. |
 | `render_match(/Count: \d+/)` | Regex variant, also ANSI-stripped. |
-| `navigate_to("/path")` | The response is a navigation to that path. |
+| `navigate_to(:screen_name)` | The response is a navigation to that screen; pass params to assert them too: `navigate_to(:entry, id: 5)`. |
 | `be_quit` / `be_navigate` | Predicate matchers on `Response`. |
 
 ## Journey Specs
@@ -104,7 +104,7 @@ instead of hanging it.
 
 ## Controller Specs
 
-Instantiate controllers with an application and dispatch actions directly:
+Instantiate controllers with an application and dispatch actions directly. Controllers are persistent per screen, so one instance serves every dispatch and instance variables survive across events:
 
 ```ruby
 RSpec.describe MyApp::HomeController do
@@ -118,11 +118,12 @@ RSpec.describe MyApp::HomeController do
 end
 ```
 
-Pass events when testing key, timer, task, or mouse dispatch:
+Pass events to the dispatch methods when testing key, timer, task, or mouse dispatch:
 
 ```ruby
+controller = described_class.new(application: application)
 event = Charming::Events::KeyEvent.new(key: :up)
-response = described_class.new(application: application, event: event).dispatch_key
+response = controller.dispatch_key(event)
 ```
 
 Route params can be passed directly for controller-level tests:

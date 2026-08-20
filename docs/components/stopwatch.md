@@ -15,7 +15,7 @@ permalink: /docs/components/stopwatch/
 
 ## Quick start
 
-Controllers are rebuilt per dispatch, so keep the elapsed seconds and running flag in [state]({{ '/docs/state/' | relative_url }}) and rebuild the stopwatch from them:
+Keep the elapsed seconds and running flag in [state]({{ '/docs/state/' | relative_url }}) and rebuild the stopwatch from them each render. Do not memoize the component: the tick action receives cumulative elapsed time, so a reused instance would double-count.
 
 ```ruby
 class WorkoutState < ApplicationState

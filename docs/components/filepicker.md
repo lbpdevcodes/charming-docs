@@ -20,24 +20,26 @@ Below the root, a `../` entry leads back up; directories (with a `/` suffix) lis
 
 ## Quick start
 
-The picker tracks its own `current_dir` as you browse, so keep the *instance* in durable state instead of rebuilding it each event:
+The picker tracks its own `current_dir` as you browse, so keep the *instance* around in a memoized ivar instead of rebuilding it:
 
 ```ruby
 class OpenFileController < ApplicationController
   focus_ring :picker
+
+  on_select :picker, :open_file
 
   def show
     render :show, file_picker: picker
   end
 
   # Enter on a file returns its absolute path.
-  def picker_selected(path)
+  def open_file(path)
     open_state.path = path
-    navigate_to "/editor"
+    navigate :editor
   end
 
   def picker
-    open_state.picker ||= Charming::Components::Filepicker.new(
+    @picker ||= Charming::Components::Filepicker.new(
       root: Dir.pwd,
       height: 12,
       theme: theme
@@ -82,7 +84,7 @@ end
 
 | Return value | Meaning |
 |--------------|---------|
-| `[:selected, absolute_path]` | Enter on a file — dispatches `<slot>_selected(path)` with the file's absolute path. |
+| `[:selected, absolute_path]` | Enter on a file — dispatches the action declared with `on_select` (the action receives the file's absolute path). |
 | `:handled` | A descend, ascend, or navigation key was consumed. |
 | `nil` | The event was not handled (e.g. Backspace at the root). |
 
@@ -96,6 +98,6 @@ See the shared [component protocol]({{ '/docs/components/build-your-own/' | rela
 
 ## Tips
 
-- **Persist the instance, not just an index.** Unlike List, the picker's position — `current_dir` and the highlight within it — lives inside the component, and there is no constructor argument to restore `current_dir`. Since components are rebuilt on every event, a per-dispatch `@picker ||=` would reset browsing to `root:` on each keypress. Keep the component in a state attribute (`open_state.picker ||= ...`, as in the quick start) so navigation survives across dispatches.
+- **Keep the instance, not just an index.** Unlike List, the picker's position — `current_dir` and the highlight within it — lives inside the component, and there is no constructor argument to restore `current_dir`. The memoized ivar (as in the quick start) keeps it for the screen's lifetime; stash the component in a state attribute (`open_state.picker ||= ...`) when browsing must survive navigation away and back.
 - The `root:` boundary is a hard floor: Backspace and the `../` entry both refuse to leave it. Pass `/` (or a suitably high directory) if the user should roam.
-- Directory entries end with `/` in `entries`; the selected *file* path handed to your hook is absolute and has no suffix.
+- Directory entries end with `/` in `entries`; the selected *file* path handed to your action is absolute and has no suffix.

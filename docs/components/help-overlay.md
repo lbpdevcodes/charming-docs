@@ -29,6 +29,8 @@ Build it straight from a controller class with `for_controller`, which reads the
 class ApplicationController < Charming::Controller
   key "?", :open_help, scope: :global
 
+  on_cancel :help_overlay, :close_help
+
   def open_help
     session[:help_open] = true
     focus.push_scope([:help_overlay], origin: :modal)
@@ -39,7 +41,7 @@ class ApplicationController < Charming::Controller
     Charming::Components::HelpOverlay.for_controller(self.class, theme: theme)
   end
 
-  def help_overlay_cancelled
+  def close_help
     session.delete(:help_open)
     focus.pop_scope
     render_default_action
@@ -86,7 +88,7 @@ Any key dismisses the overlay. It also declares `captures_text?` as true, so whi
 
 ## What it returns
 
-`handle_key` always returns `:cancelled`, which dispatches to your `<slot>_cancelled` controller hook. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
+`handle_key` always returns `:cancelled`, which dispatches the action declared with `on_cancel` for the slot. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
 
 ## Working with it
 
@@ -94,5 +96,5 @@ Any key dismisses the overlay. It also declares `captures_text?` as true, so whi
 
 ## Tips
 
-- Push a focus scope (`focus.push_scope([:help_overlay], origin: :modal)`) when opening it so every key routes to the overlay, and pop it in the `_cancelled` hook — otherwise the dismissing key also hits whatever was focused underneath.
+- Push a focus scope (`focus.push_scope([:help_overlay], origin: :modal)`) when opening it so every key routes to the overlay, and pop it in the cancel action — otherwise the dismissing key also hits whatever was focused underneath.
 - `for_controller` only shows bindings declared with `key` on that class (and its ancestors); descriptions are just humanized action names, so name actions readably.

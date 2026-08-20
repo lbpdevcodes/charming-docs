@@ -7,7 +7,7 @@ permalink: /docs/components/form/
 ---
 # Form
 
-`Charming::Components::Form` is a huh-inspired multi-field form with built-in focus traversal, validation, and submit/cancel handling. You rarely construct it directly — the controller's `form(:name) { |f| ... }` helper builds one bound to a session-backed state hash, so typed input survives the fresh controller instance created for every event. Forms are interactive and capture text: while focused, printable characters route to the active field before any key binding (typing `q` inserts a q instead of quitting), `tab` does field navigation instead of focus-ring traversal, and ctrl/alt shortcuts like `ctrl+s` keep working.
+`Charming::Components::Form` is a huh-inspired multi-field form with built-in focus traversal, validation, and submit/cancel handling. You rarely construct it directly — the controller's `form(:name) { |f| ... }` helper builds one bound to a state hash kept on the controller instance, so typed input survives between events on the screen. Forms are interactive and capture text: while focused, printable characters route to the active field before any key binding (typing `q` inserts a q instead of quitting), `tab` does field navigation instead of focus-ring traversal, and ctrl/alt shortcuts like `ctrl+s` keep working.
 
 ```text
 > Name: Ada|
@@ -31,20 +31,23 @@ Adapted from the journal example's `ComposeController`:
 class ComposeController < ApplicationController
   focus_ring :entry_form, :sidebar
 
+  on_submit :entry_form, :save_entry
+  on_cancel :entry_form, :cancel_edit
+
   def show
     render :show, form: entry_form
   end
 
   # Ctrl+S (or Enter on the last field) with valid values lands here.
-  def entry_form_submitted(values)
+  def save_entry(values)
     entry = Entry.create!(title: values[:title], mood: values[:mood], body: values[:body])
-    session[:forms]&.delete(:entry)          # clear the draft
-    navigate_to "/entries/#{entry.id}"
+    reset_form(:entry)                       # clear the draft
+    navigate :entry, id: entry.id
   end
 
-  def entry_form_cancelled
-    session[:forms]&.delete(:entry)
-    navigate_to "/"
+  def cancel_edit
+    reset_form(:entry)
+    navigate :root
   end
 
   def entry_form
@@ -63,7 +66,7 @@ end
 <%= render_component form %>
 ```
 
-`form(:entry)` scopes the form's mutable state to `session[:forms][:entry]` — only primitive values are stored there, and the component is rebuilt from them on each dispatch. Zero-arity blocks are also supported and are `instance_eval`'d against the builder (`form(:entry) { input :title }`).
+`form(:entry)` scopes the form's mutable state to a hash kept on the controller instance — only primitive values are stored there, and the component is rebuilt from them on each dispatch. Zero-arity blocks are also supported and are `instance_eval`'d against the builder (`form(:entry) { input :title }`).
 
 ## Field types
 
@@ -174,7 +177,7 @@ Bracketed paste routes to the focused field. Input fields insert the pasted text
 
 ## What it returns
 
-`handle_key` returns `[:submitted, values]` when validation passes (values is a `{field_name => value}` hash), `:cancelled` on Escape, and `:handled` while editing. On a focus slot these invoke `<slot>_submitted(values)` and `<slot>_cancelled` — the slot is the controller method name (`entry_form` above), not the form name. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
+`handle_key` returns `[:submitted, values]` when validation passes (values is a `{field_name => value}` hash), `:cancelled` on Escape, and `:handled` while editing. On a focus slot these dispatch the actions declared with `on_submit` and `on_cancel` — the slot is the controller method name (`entry_form` above), not the form name. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
 
 ## Working with it
 
@@ -184,7 +187,7 @@ Bracketed paste routes to the focused field. Input fields insert the pasted text
 
 ## Tips
 
-- Field `value:` options only seed the state hash the first time the form is bound. To re-seed (say, switching from "new" to "edit"), delete the stale draft first: `session[:forms]&.delete(:entry)`. The journal example tracks a `session[:compose_mode]` marker in a `before_action` and clears the form whenever the mode changes.
+- Field `value:` options only seed the state hash the first time the form is bound. To re-seed (say, switching from "new" to "edit"), clear the stale draft first: `reset_form(:entry)`. The journal example tracks a `@compose_mode` ivar in a `before_action` and resets the form whenever the mode changes.
 - Focus-slot methods run on key-dispatch paths where `before_action` callbacks have **not** run — build the form from `session`/`params`, never from hook-populated instance variables.
 - Select and multiselect values are the option objects themselves (symbols, records, whatever you passed in `options:`), with `option_label:` used only for display.
 - Notes and other non-focusable fields are skipped by Tab and Enter traversal; Enter submits from the last *focusable* field even when a note renders after it.

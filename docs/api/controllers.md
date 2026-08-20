@@ -7,7 +7,7 @@ permalink: /docs/api/controllers/
 ---
 # Controllers & Responses
 
-Controllers are where your app's behavior lives: they bind keys, run actions, kick off async tasks, and decide what happens next. Every action returns a **response object** — render, navigate, or quit — that the runtime then carries out. Durable data goes in **`ApplicationState`** objects, because controller instances themselves are thrown away between events. For a guided introduction, see [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }}).
+Controllers are where your app's behavior lives: they bind keys, run actions, kick off async tasks, and decide what happens next. Every action returns a **response object** — render, navigate, or quit — that the runtime then carries out. One controller instance handles every event for its screen, so instance variables are legal screen-lifetime state. Data that must outlive the screen goes in **`ApplicationState`** objects. For a guided introduction, see [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_url }}).
 
 ## Charming::Controller
 
@@ -19,7 +19,15 @@ Key bindings and commands — how users trigger actions:
 
 - `key name, action, scope: :content` binds a content-pane key to an action.
 - `key name, action, scope: :global` binds an app-level shortcut.
-- `command label, action = nil, &block` adds a command palette item.
+- `command label, action = nil, &block` adds a command palette item (available when the controller includes `Charming::Shell::Palette`).
+
+Component event declarations — how interactive components report results:
+
+- `on_submit slot, action` routes a component's submitted value to an action.
+- `on_select slot, action` routes a `[:selected, value]` component result to an action.
+- `on_cancel slot, action` routes a `:cancelled` component result to an action (no value argument).
+
+The old `<slot>_submitted` naming convention still works but emits a one-time deprecation warning. A component result with no handler raises `Charming::UnhandledComponentEvent` in development and test; production logs a warning and falls back to the default render.
 
 Timers and animation — periodic dispatch while the route is active:
 
@@ -49,8 +57,14 @@ Layout and focus:
 
 Dispatch — how the runtime invokes actions (app code rarely calls these directly):
 
-- `dispatch(action)` calls an action (through its hooks) and returns a response.
-- `dispatch_key`, `dispatch_timer`, `dispatch_task`, `dispatch_task_progress`, `dispatch_mouse`, and `dispatch_paste` dispatch event-specific handlers.
+- `dispatch(action, event: nil)` calls an action (through its hooks) and returns a response.
+- `dispatch_key(event)`, `dispatch_timer(event)`, `dispatch_task(event)`, `dispatch_task_progress(event)`, `dispatch_mouse(event)`, and `dispatch_paste(event)` dispatch event-specific handlers.
+- `Controller.new(event:)` is deprecated — the event arrives at dispatch time.
+
+Screen lifecycle — override to manage per-screen resources:
+
+- `screen_entered` runs after construction, before the first dispatch.
+- `screen_exited` runs before the instance is discarded on navigation or quit.
 
 Rendering and navigation — what actions return:
 
@@ -59,14 +73,14 @@ Rendering and navigation — what actions return:
 - `render :show, **assigns` renders a conventional Ruby view class, falling back to `app/views/<controller>/show.tui.erb` or `.txt.erb`.
 - `render view_object` renders a class-based view or component object.
 - `render_template(name, **assigns)` renders an explicit template path under `app/views`.
-- `navigate_to(path)` produces a navigation response.
+- `navigate(name, **params)` produces a navigation response. Params pass through as Ruby values.
 - `quit` produces a quit response.
 
 State and session — where data survives between events:
 
 - `session` accesses the application session.
 - `state(name, state_class, **attributes)` stores or returns a session-backed state object.
-- `component_state(name, **defaults)` stores or returns a JSON-safe primitive hash for widget state (cursor, selection, offsets) — seeded from `defaults` on first access; survives `persist_session`.
+- `component_state(name, **defaults)` is deprecated — use memoized instance variables (for example `@query ||= Components::TextInput.new(...)`) for widget state.
 - `logger` returns the application logger.
 
 Tasks and timers at runtime:
@@ -77,13 +91,13 @@ Tasks and timers at runtime:
 
 Request context — what the current event looks like:
 
-- `params` exposes current route params.
+- `params` exposes the current screen's navigate-time params.
 - `event` exposes the current key, timer, task, progress, resize, mouse, or paste event.
 - `screen` exposes terminal dimensions.
 - `theme` returns the current theme.
 - `use_theme(name)` switches themes.
 
-Palettes:
+Palettes (from `include Charming::Shell::Palette`):
 
 - `open_command_palette`, `close_command_palette`, and `command_palette` manage the command palette.
 - `open_theme_palette` opens the theme picker.
@@ -93,15 +107,15 @@ Focus:
 
 - `focus` returns the controller's focus object (`focus.push_scope`, `focus.pop_scope`, `focus.cycle`, `focus.focus(slot)`, `focus.current`, `focus.ring`, `focus.overlay?`).
 - `focused?(slot)` asks whether a slot is currently focused.
-- `focus_sidebar`, `focus_content`, `sidebar_focused?`, and `content_focused?` support generated layouts (`focus_content` targets `:content` or the first non-sidebar slot in the ring).
-- `sidebar_routes` returns the routes listed in the sidebar — override to filter.
+- `focus_sidebar`, `focus_content`, `sidebar_focused?`, and `content_focused?` (from `include Charming::Shell::Sidebar`) support generated layouts (`focus_content` targets `:content` or the first non-sidebar slot in the ring).
+- `sidebar_routes` (from `Charming::Shell::Sidebar`) returns the routes listed in the sidebar — override to filter.
 
 {: .important }
-Controller instances are ephemeral. Store durable state in `ApplicationState` objects through `state(...)`. Focus-slot component methods are invoked on key-dispatch paths where `before_action` has not run — build components from `session`/`params`, not hook-set instance variables.
+One controller instance handles every event for its screen. Use instance variables for screen-lifetime state, `state(:name, StateClass)` objects for app-lifetime state, and `persist_session` for restart-lifetime state. Hooks do not run on component key dispatch — build focus-slot components from `session`/`params`, not hook-set instance variables. Data-bound components need both halves: memoize the component so its selection survives, and refresh its data on render (`list.items = rows`, `table.rows = rows`).
 
 ## Charming::ApplicationState
 
-Typed, session-backed state objects — the durable home for data that outlives a single controller instance. Inherit from `Charming::ApplicationState`:
+Typed, session-backed state objects — the durable home for data that outlives a single screen. Inherit from `Charming::ApplicationState`:
 
 ```ruby
 class CounterState < Charming::ApplicationState
@@ -118,13 +132,13 @@ Common attribute types include `:string`, `:integer`, `:float`, `:boolean`, `:da
 Every controller action returns a response object telling the runtime what to do next. Controllers return response objects through helper methods:
 
 - `render(...)` creates a render response.
-- `navigate_to(path)` creates a navigation response.
+- `navigate(name, **params)` creates a navigation response.
 - `quit` creates a quit response.
 
 Response factories:
 
 - `Charming::Response.render(body)`
-- `Charming::Response.navigate(path)`
+- `Charming::Response.navigate(name, **params)`
 - `Charming::Response.quit`
 
 Response predicates:
@@ -136,6 +150,7 @@ Response attributes:
 
 - `kind`
 - `body`
-- `path`
+- `name`
+- `params`
 
 The runtime follows navigation responses, renders render responses, and exits on quit responses.

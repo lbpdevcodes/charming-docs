@@ -17,15 +17,16 @@ Apps normally use `TTYBackend` through `Charming.run`. Tests should use `Charmin
 
 `require "charming/test_helper"` and `include Charming::TestHelper`:
 
-- `build_controller(klass, app:, screen:, route:, event:)` — controller with test defaults.
+- `build_controller(klass, app:, screen:, route:, params:)` — one controller instance with test defaults; runs `screen_entered`.
 - `key_event("ctrl+p")` — `KeyEvent` from a human-readable string.
-- `press(klass, "q", app:)` — dispatch one key press, returns the `Response`.
-- `press_sequence(klass, %w[down enter], app:)` — multiple presses sharing the app session.
+- `press(ctrl, "q")` — dispatch one key press at the instance, returns the `Response`.
+- `press_sequence(ctrl, %w[down enter])` — multiple presses at the same instance (controllers persist per screen).
 - `memory_backend("up", "q", width: 80, height: 24)` — pre-seeded `MemoryBackend`.
 
 RSpec matchers (registered when RSpec is loaded): `render_text("...")` and
-`render_match(/.../)` compare against the ANSI-stripped body; `navigate_to("/path")`
-asserts navigation; `be_quit` / `be_navigate` are response predicates.
+`render_match(/.../)` compare against the ANSI-stripped body; `navigate_to(:screen_name)`
+asserts navigation (with optional params, e.g. `navigate_to(:entry, id: 5)`);
+`be_quit` / `be_navigate` are response predicates.
 
 ## CLI
 

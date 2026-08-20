@@ -19,23 +19,28 @@ The selected row gets a `> ` prefix and the theme's selected style.
 
 ## Quick start
 
-Build the list in a memoized focus-slot method, put the slot in the focus ring, and persist the selection back to state on render (adapted from the journal example's `entries_controller.rb`):
+Build the list once in a memoized focus-slot method, put the slot in the focus ring, and refresh its items on render (adapted from the journal example's `entries_controller.rb`):
 
 ```ruby
 class EntriesController < ApplicationController
   focus_ring :entries
 
+  on_select :entries, :open_entry
+
   def show
+    entries.items = Entry.recent_first.to_a
     entries_state.selected_index = entries.selected_index
     render :show, entries_list: entries
   end
 
   # Enter on the list opens the selected entry.
-  def entries_selected(entry)
-    navigate_to "/entries/#{entry.id}"
+  def open_entry(entry)
+    navigate :entry, id: entry.id
   end
 
-  # The selectable entry list, restored from session state each dispatch.
+  # The selectable entry list, memoized so j/k selection survives across events.
+  # `show` refreshes the items each render — the component holds the interaction
+  # state, the items always reflect the database.
   def entries
     @entries ||= Charming::Components::List.new(
       items: Entry.recent_first.to_a,
@@ -90,7 +95,7 @@ A click within the visible window selects the clicked row. Mouse handling requir
 
 | Return value | Meaning |
 |--------------|---------|
-| `[:selected, item]` | Enter pressed with an item highlighted — dispatches `<slot>_selected(item)` on the controller. |
+| `[:selected, item]` | Enter pressed with an item highlighted — dispatches the action declared with `on_select :slot, :action` (the action receives the item). |
 | `:handled` | A navigation key or click was consumed. |
 | `nil` | The event was not handled. |
 
@@ -102,9 +107,10 @@ See the shared [component protocol]({{ '/docs/components/build-your-own/' | rela
 - `selected_index` — the highlighted index (within the filtered view).
 - `items` — the visible items: the source list narrowed by the active filter, or the full list when no filter is set.
 - `filter` / `filter = query` — read or replace the fuzzy query; assigning reclamps the selection to the narrowed view (`nil` clears it).
+- `items = new_items` — replace the source items after the data changed; the selection reclamps. This is the data-refresh half of the memoized-list pattern.
 
 ## Tips
 
-- **Components are rebuilt on every event.** A fresh controller (and a fresh `List`) is created per dispatch, so the selection only survives because the controller writes `entries.selected_index` into state during `show` and passes it back in on construction. Skip that round-trip and the list snaps back to item 0 on every keypress.
+- **Memoize the list, refresh its items.** Keep the `List` in an ivar so j/k movement and scroll position survive across events, and assign `list.items = rows` on each render so the data stays fresh. Rebuilding the component per dispatch instead would discard the keypress that moved the selection before the state write-back could see it.
 - `selected_index` is a position within the *filtered* view, not the source array. When you drive `filter=` from a text input, persist the index after filtering, and expect it to reclamp as the match set shrinks.
 - Without `height:` the whole list renders and mouse clicks are ignored — set a height for long lists.

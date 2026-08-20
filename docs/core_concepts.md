@@ -49,21 +49,33 @@ MyApp::Application.routes do
 end
 ```
 
-## Controllers Are Ephemeral
+## Controllers Are Persistent Per Screen
 
-Charming creates a fresh controller instance for each dispatch. A controller handles one action or event and returns a response.
-
-Do not store durable state in controller instance variables. This is wrong for state that must survive multiple key presses:
+Charming creates one controller instance when a route is entered. The instance handles every action and event for that screen. Instance variables live for the screen's lifetime:
 
 ```ruby
 def increment
-  @count ||= 0
-  @count += 1
+  @count = (@count || 0) + 1
   render "Count: #{@count}"
 end
 ```
 
-Store durable state in an application state object instead:
+Navigation away discards the instance. Returning to the screen builds a fresh one, so ivars reset. Two hooks bracket the lifetime. Use them to start and stop per-screen resources:
+
+```ruby
+def screen_entered
+  @player = Audio::Player.new
+end
+
+def screen_exited
+  @player&.stop
+end
+```
+
+### The three state lifetimes
+
+1. **Screen-lifetime state goes in ivars.** Components with interaction state belong in memoized ivars: `@query ||= Components::TextInput.new(...)`. They die with the screen. Data-bound components need both halves: memoize the component so its interaction state (selection, scroll) survives, and refresh its data on render — `list.items = rows` or `table.rows = rows`.
+2. **App-lifetime state goes in state objects.** `Controller#state` stores the object in the application session. It survives navigation:
 
 ```ruby
 def increment
@@ -78,7 +90,7 @@ def counter
 end
 ```
 
-`Controller#state` stores the state object in the application session and returns the same object on later dispatches.
+3. **Restart-lifetime state goes in the persisted session.** `persist_session` writes the session as JSON on quit and restores it on boot. Only JSON-safe values survive.
 
 ## Views And Layouts
 

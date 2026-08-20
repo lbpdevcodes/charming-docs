@@ -81,4 +81,4 @@ Then any action can call `show_toast("Deleted \"#{entry.title}\"", kind: :warn)`
 ## Tips
 
 - The component never dismisses itself. The lifetime lives in your controller: store the toast with a deadline, run a timer, delete it when the deadline passes (the pattern above).
-- Keep toast state in `session`, not instance variables — components and controllers are rebuilt on every event.
+- Keep toast state in `session` — the auto-expiry timer action reads it there, outside any one key dispatch.

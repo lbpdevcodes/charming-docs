@@ -25,13 +25,15 @@ Expanded branches are marked `▾`, collapsed branches `▸`; each level indents
 class FilesController < ApplicationController
   focus_ring :files
 
+  on_select :files, :open_node
+
   def show
     files_state.cursor_index = files.cursor_index
     render :show, files_tree: files
   end
 
   # Enter on a leaf returns its node hash.
-  def files_selected(node)
+  def open_node(node)
     open_file(node[:label])
   end
 
@@ -91,7 +93,7 @@ A click moves the cursor to the clicked row; clicking a branch also toggles its 
 
 | Return value | Meaning |
 |--------------|---------|
-| `[:selected, node]` | Enter on a leaf — dispatches `<slot>_selected(node)` with the node hash. |
+| `[:selected, node]` | Enter on a leaf — dispatches the action declared with `on_select` (the action receives the node hash). |
 | `:handled` | Navigation, expand/collapse, branch toggle, or click was consumed. |
 | `nil` | The event was not handled (or the tree is empty). |
 
@@ -105,7 +107,7 @@ See the shared [component protocol]({{ '/docs/components/build-your-own/' | rela
 
 ## Tips
 
-- **The node hashes are mutated in place** — expanding a branch sets `node[:expanded] = true` on *your* hash. Keep the nodes array in durable controller state (as in the quick start) so expansion survives the rebuild-per-event cycle. If you rebuild the array from scratch each dispatch, every branch snaps shut.
-- Persist `cursor_index` in state too, and pass it back on construction — components are rebuilt on every event.
+- **The node hashes are mutated in place** — expanding a branch sets `node[:expanded] = true` on *your* hash. Keep the nodes array in durable controller state (as in the quick start) so expansion survives navigation away and back. If you rebuild the array from scratch each visit, every branch snaps shut.
+- Persist `cursor_index` in state too, and pass it back on construction — the memoized component is discarded when the screen is left.
 - `cursor_index` indexes the *visible* rows, so collapsing a branch above the cursor shifts what the index points at. The constructor clamps it into range, but after structural changes verify the cursor still sits where you expect.
 - Enter never selects a branch — it toggles it. Only leaves (nodes without non-empty `children`) produce `[:selected, node]`.

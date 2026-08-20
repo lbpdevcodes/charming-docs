@@ -6,7 +6,7 @@ permalink: /docs/state/
 ---
 # State
 
-Application state classes hold durable in-memory TUI state. Controllers are created fresh per dispatch, so state that must survive key presses, timer ticks, task completions, and route renders belongs in state objects.
+Controllers are persistent per screen, so screen-lifetime state belongs in controller ivars. Application state classes hold app-lifetime state: values that must survive navigation away from the screen.
 
 ## ApplicationState
 
@@ -84,7 +84,7 @@ Controller actions can call `valid?` and inspect `errors`:
 ```ruby
 def save
   if form.valid?
-    navigate_to "/"
+    navigate :root
   else
     render :edit, form: form
   end
@@ -94,31 +94,33 @@ end
 ## Component State
 
 Interactive widgets need state that outlives one event — a cursor position, a
-scroll offset, an expanded-node set. The idiom is `component_state`: a JSON-safe
-primitive hash in the session that you rebuild the component from each event and
-write changed values back to after `handle_key`:
+scroll offset, an expanded-node set. Persistent controllers keep components for
+the screen's lifetime, so the idiom is a memoized ivar:
 
 ```ruby
-def show
-  query = component_state(:query, value: "", cursor: 0)   # seeded on first access
-  input = Charming::Components::TextInput.new(value: query[:value], cursor: query[:cursor])
-  input.handle_key(event) if event
-  query[:value] = input.value                             # write changes back
-  query[:cursor] = input.cursor
-  render "query: #{query[:value]}"
+def query
+  @query ||= Charming::Components::TextInput.new
 end
 ```
 
-The command palette, forms, focus, and sidebar all work this way, and these hashes
-survive `persist_session`. Do **not** store live component objects (`TextInput`,
-`List`, …) in the session — they are silently dropped on persist; their mutable
-state belongs in a `component_state` hash. (The exception is runtime engine handles
-like `session[:audio] ||= Charming::Audio::Player.new`, which wrap a live process
-and are intentionally dropped by `save_session`.)
+The component object itself holds its state (value, cursor) across key presses.
+Do **not** store live component objects in the session — `save_session` drops
+anything that can't survive a JSON round-trip. (The exception is runtime engine
+handles like `session[:audio] ||= Charming::Audio::Player.new`, which wrap a live
+process and are intentionally dropped by `save_session`.)
+
+Do not memoize data-bound components. A memoized `List` of database rows serves
+stale items after the data changes. Rebuild those each dispatch and keep their
+interaction state, like the selected index, in a `state` object.
+
+`component_state` (a session-backed widget-state hash) still works but is
+deprecated — use ivars for screen-lifetime component state.
 
 ## Form State
 
-Use `Controller#form` for session-backed terminal forms. Charming stores only primitive form data under `session[:forms]`, then rebuilds form components on each dispatch.
+Use `Controller#form` for terminal forms. Charming stores the form's primitive
+state (values, field cursors, errors, focus) on the controller instance, so the
+draft survives events on the screen and is discarded on navigation.
 
 ```ruby
 def signup_form
@@ -131,41 +133,34 @@ def signup_form
 end
 ```
 
-Textarea fields store their editing state alongside the value:
-
-```ruby
-session[:forms][:signup] = {
-  values: {bio: "Line one\nLine two"},
-  fields: {bio: {cursor: 18, offset: 0, preferred_column: 8}},
-  errors: {},
-  focus_index: 0
-}
-```
-
-On submit, the focused form returns `[:submitted, values]` and dispatches to a hook matching the focus slot:
+On submit, the focused form returns `[:submitted, values]` and dispatches to
+the action declared for the focus slot:
 
 ```ruby
 focus_ring :signup_form
+on_submit :signup_form, :save_signup
 
-def signup_form_submitted(values)
+def save_signup(values)
   profile.assign_attributes(values)
-  profile.valid? ? navigate_to("/") : show
+  profile.valid? ? navigate(:root) : show
 end
 ```
 
-Form state outlives the screen, which is what you want for drafts — but when one
-form serves both "new" and "edit" modes, clear the stale draft when the mode (or the
-record) changes so the builder's defaults re-seed:
+The declarations are `on_submit`, `on_select`, and `on_cancel`. Submit and
+select actions receive the value; cancel actions receive no arguments.
+
+When one form serves both "new" and "edit" modes, clear the stale draft when
+the mode (or the record) changes so the builder's defaults re-seed:
 
 ```ruby
 before_action :prepare_form_state
 
 def prepare_form_state
   mode = editing_entry ? "edit-#{editing_entry.id}" : "new"
-  return if session[:compose_mode] == mode
+  return if @compose_mode == mode
 
-  session[:compose_mode] = mode
-  session[:forms]&.delete(:entry)
+  @compose_mode = mode
+  reset_form(:entry)
 end
 ```
 
@@ -183,22 +178,9 @@ The runtime saves on exit and the application reloads on boot. Only JSON-safe va
 survive: nil, booleans, numbers, strings, symbols, and arrays/hashes of those. Hash
 keys come back as symbols; symbol *values* come back as strings. Everything else —
 state objects, procs — is silently skipped, and the framework always excludes its
-internal keys (`focus_state`, `command_palette`, `mouse_targets`). A corrupt or
+internal keys (`focus_state`, `command_palette`). A corrupt or
 missing file falls back to an empty session.
 
-Good candidates: the chosen theme (stored automatically by `use_theme`), scroll
-positions, and form drafts.
-
-## What Not To Store In Controllers
-
-Avoid this for durable state:
-
-```ruby
-def increment
-  @count ||= 0
-  @count += 1
-  render "Count: #{@count}"
-end
-```
-
-The next dispatch receives a fresh controller instance, so the instance variable is not reliable application state.
+Good candidates: the chosen theme (stored automatically by `use_theme`) and
+scroll positions that must survive restarts. Form drafts live on the controller
+instance and are not restart-persisted.

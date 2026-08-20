@@ -118,7 +118,7 @@ app/state/home_state.rb              # durable in-memory state
 app/views/home/show_view.rb          # what the screen renders
 app/views/layouts/application_layout.rb
 app/models/application_record.rb     # base class for models
-config/routes.rb                     # url -> controller#action
+config/routes.rb                     # screen name -> controller#action
 config/database.rb                   # picks the db file from CHARMING_ENV
 ```
 
@@ -230,21 +230,18 @@ irb> Todo::Task.count
 
 ## 4. Listing tasks (the read path)
 
-Controllers in Charming are **ephemeral** — a fresh instance per keypress — so
-anything that must survive between keystrokes lives in a state object. Our screen
-needs to remember two things: the text being typed into the add box, and which row
-is highlighted. Replace the generated `HomeState`:
+One controller instance lives for the whole time its screen is active, so instance
+variables survive between keystrokes. Data-bound components are the exception:
+rebuild them on each dispatch so they always reflect the database, and keep their
+interaction state in a state object. Our list needs one thing remembered across
+dispatches: which row is highlighted. Replace the generated `HomeState`:
 
 ```ruby
 # app/state/home_state.rb
 module Todo
   class HomeState < ApplicationState
-    # The in-progress text in the add-task input. Controllers are recreated every
-    # dispatch, so the draft is parked here (session-backed) and re-seeded into the
-    # TextInput on each render.
-    attribute :draft, :string, default: ""
-
-    # The highlighted row in the task list, preserved across dispatches.
+    # The highlighted row in the task list. The list is rebuilt from the database
+    # each dispatch, so the selection is kept here.
     attribute :selected_index, :integer, default: 0
   end
 end
@@ -259,11 +256,14 @@ Now the controller. Start with just the read path — build a
 module Todo
   class HomeController < ApplicationController
     def show
+      tasks.items = Task.ordered.to_a
       home.selected_index = tasks.selected_index
       render :show, tasks: tasks, palette: command_palette
     end
 
-    # The selectable task list, restored from session state each dispatch.
+    # The selectable task list, memoized so j/k selection survives across
+    # events. `show` refreshes the items each render — the component holds
+    # the interaction state, the items always reflect the database.
     def tasks
       @tasks ||= Charming::Components::List.new(
         items: Task.ordered.to_a,
@@ -332,8 +332,8 @@ now — we wire up focus and keys in the next two chapters.
 
 To add tasks we need a text input the user can type into, and a way to submit it.
 Charming's `TextInput` captures keystrokes; pressing **Enter** returns
-`[:submitted, value]`, which the runtime dispatches to a `<slot>_submitted` hook on
-the controller — the same pattern the `List` uses for selection.
+`[:submitted, value]`. An `on_submit` declaration on the controller names the
+action that receives the value — the same pattern the `List` uses for selection.
 
 Two new ideas make this work:
 
@@ -349,11 +349,11 @@ Two new ideas make this work:
   > slot to route key events. This is why our list method is named `tasks` and not,
   > say, `tasks_list`: a slot with no matching method becomes a silent dead stop that
   > `Tab` lands on but no keys reach.
-- **Re-seeding the input.** Because the controller is recreated every keystroke, we
-  park the in-progress text in `home.draft` and rebuild the `TextInput` from it each
-  render. On submit we clear the draft.
+- **A memoized input.** The controller instance persists for the screen's lifetime,
+  so `@new_task ||=` keeps the typed text across keypresses. On submit we drop the
+  memoized input, and the next render builds a blank one.
 
-Update the controller to add the input, the focus ring, and the create hook:
+Update the controller to add the input, the focus ring, and the submit handler:
 
 ```ruby
 # app/controllers/home_controller.rb
@@ -361,27 +361,29 @@ module Todo
   class HomeController < ApplicationController
     focus_ring :new_task, :tasks
 
+    on_submit :new_task, :create_task
+
     def show
-      home.draft = new_task.value
+      tasks.items = Task.ordered.to_a
       home.selected_index = tasks.selected_index
       render :show, new_task: new_task, tasks: tasks, palette: command_palette
     end
 
     # Enter in the input creates a task. TextInput returns [:submitted, value],
-    # which the runtime dispatches here as `<slot>_submitted(value)`.
-    def new_task_submitted(value)
+    # which the `on_submit` declaration routes here.
+    def create_task(value)
       title = value.to_s.strip
       return show if title.empty?
 
       Task.create!(title: title, done: false)
-      clear_new_task
+      @new_task = nil # drop the memoized input so `show` rebuilds it blank
       show
     end
 
-    # The add-task input, re-seeded from the session-backed draft each dispatch.
+    # The add-task input. The controller persists for the screen's lifetime, so the
+    # memoized input keeps the typed text across keypresses.
     def new_task
       @new_task ||= Charming::Components::TextInput.new(
-        value: home.draft,
         placeholder: "Add a task and press enter…"
       )
     end
@@ -400,12 +402,6 @@ module Todo
 
     def home
       state(:home, HomeState)
-    end
-
-    # Empties the draft and drops the memoized input so `show` rebuilds it blank.
-    def clear_new_task
-      home.draft = ""
-      @new_task = nil
     end
   end
 end
@@ -477,7 +473,7 @@ the database. Press `Tab` and watch the `▸` marker jump between **New task** a
 {: .note }
 > **A fix we made while writing this tutorial.** Building this app surfaced a gap in
 > the framework: `TextInput` swallowed the Enter key, so a focused input could never
-> trigger a `_submitted` hook the way `List`, `MultiSelectList`, and `Autocomplete`
+> report a submission the way `List`, `MultiSelectList`, and `Autocomplete`
 > already did. We taught `TextInput` to return `[:submitted, value]` on Enter — which
 > is exactly what makes the code above work. Dogfooding the generators is the fastest
 > way to find rough edges.
@@ -489,15 +485,16 @@ delete it, and `Enter` to also toggle (the list reports Enter as a selection). K
 bindings declared with `key` fire when a non-text component has focus; while the
 input is focused those same keys are just typed characters.
 
-Add the bindings and three handlers:
+Add the bindings, an `on_select` declaration, and three handlers:
 
 ```ruby
 # app/controllers/home_controller.rb — add near the top of the class
 key "space", :toggle_selected
 key "d", :delete_selected
+on_select :tasks, :toggle_task
 
 # Enter on a list row toggles the highlighted task.
-def tasks_selected(task)
+def toggle_task(task)
   task.toggle_done!
   show
 end
@@ -516,18 +513,9 @@ def delete_selected
 
   task.destroy!
   home.selected_index = [home.selected_index - 1, 0].max
-  @tasks = nil # rebuild from the database so the deleted row is gone
   show
 end
 ```
-
-{: .note }
-> **A subtle gotcha worth understanding.** `tasks` is memoized for the duration
-> of one dispatch so the view can reference it cheaply. In `delete_selected` we call
-> `tasks.selected_item` *before* destroying the record — which builds and caches
-> the list with that record still in its `items` array. After `destroy!`, the cached
-> list is stale, so we clear `@tasks` to force `show` to query a fresh list.
-> Toggling doesn't need this: it mutates the same object the list already holds.
 
 Now you have the full loop: add, toggle, delete — all persisted.
 
@@ -535,18 +523,28 @@ Now you have the full loop: add, toggle, delete — all persisted.
 
 The journal example shows a status bar along the bottom with key hints and a live
 count. Add one here. First expose the hints and count on the controllers. The base
-`ApplicationController` gets sensible defaults; the home screen prepends its own:
+`ApplicationController` gets sensible defaults; the home screen prepends its own.
+The sidebar and command palette are opt-in shell modules on the controller:
 
 ```ruby
-# app/controllers/application_controller.rb — add inside the class
-# Key hints shown in the status bar; screens prepend their own via `*super`.
-def status_hints
-  [["ctrl+p", "commands"], ["q", "quit"]]
-end
+# app/controllers/application_controller.rb
+module Todo
+  class ApplicationController < Charming::Controller
+    include Charming::Shell::Sidebar
+    include Charming::Shell::Palette
 
-# Live count rendered on the right of the status bar.
-def task_count
-  Task.count
+    # ... generated layout, focus ring, and palette commands ...
+
+    # Key hints shown in the status bar; screens prepend their own via `*super`.
+    def status_hints
+      [["ctrl+p", "commands"], ["q", "quit"]]
+    end
+
+    # Live count rendered on the right of the status bar.
+    def task_count
+      Task.count
+    end
+  end
 end
 ```
 

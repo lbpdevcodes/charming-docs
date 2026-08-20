@@ -20,26 +20,26 @@ The first line is the inner text input (with `|` cursor marker); the highlighted
 
 ## Quick start
 
-Components are rebuilt on every event, so persist the typed value, cursor, and highlight in a `component_state` hash. Expose the component from a memoized method named after a `focus_ring` slot.
+Controllers live for the screen's lifetime, so keep the component in a memoized ivar exposed from a method named after a `focus_ring` slot.
 
 ```ruby
 class GemPickerController < Charming::Controller
   focus_ring :gem_picker
 
+  on_submit :gem_picker, :pick_gem      # Enter: highlighted suggestion or free text
+  on_cancel :gem_picker, :close_picker  # Escape
+
   def show
-    gem_picker_state[:value] = gem_picker.value
-    gem_picker_state[:cursor] = gem_picker.cursor
-    gem_picker_state[:selected_index] = gem_picker.selected_index
     render :show, picker: gem_picker
   end
 
-  def gem_picker_submitted(value)     # Enter: highlighted suggestion or free text
+  def pick_gem(value)
     session[:chosen_gem] = value
-    navigate_to "/"
+    navigate :root
   end
 
-  def gem_picker_cancelled            # Escape
-    navigate_to "/"
+  def close_picker
+    navigate :root
   end
 
   private
@@ -47,16 +47,9 @@ class GemPickerController < Charming::Controller
   def gem_picker
     @gem_picker ||= Charming::Components::Autocomplete.new(
       suggestions: %w[rails rake rack rspec rubocop],
-      value: gem_picker_state[:value],
-      cursor: gem_picker_state[:cursor],
-      selected_index: gem_picker_state[:selected_index],
       placeholder: "Pick a gem…",
       theme: theme
     )
-  end
-
-  def gem_picker_state
-    component_state(:gem_picker, value: "", cursor: 0, selected_index: 0)
   end
 end
 ```
@@ -91,7 +84,7 @@ An empty value shows all suggestions (up to the cap); otherwise matches are the 
 
 ## What it returns
 
-`handle_key` returns `[:submitted, value]` on Enter (value is the highlighted suggestion, falling back to the typed text when no suggestion matches), `:cancelled` on Escape, `:handled` for consumed keys, and `nil` otherwise. On a focus slot these invoke `<slot>_submitted(value)` and `<slot>_cancelled` on the controller. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
+`handle_key` returns `[:submitted, value]` on Enter (value is the highlighted suggestion, falling back to the typed text when no suggestion matches), `:cancelled` on Escape, `:handled` for consumed keys, and `nil` otherwise. On a focus slot these dispatch the actions declared with `on_submit` and `on_cancel`. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
 
 ## Working with it
 
@@ -101,6 +94,6 @@ An empty value shows all suggestions (up to the cap); otherwise matches are the 
 
 ## Tips
 
-- Persist `value`, `cursor`, and `selected_index` — the component is rebuilt from primitives on every event.
-- The highlight is clamped after every edit, so it never points past the (possibly shrunken) match list — but it does not reset to 0 when the query changes; persist what the component reports.
+- The memoized ivar keeps `value`, `cursor`, and `selected_index` between events. Seed them from a `state` object when the picker must restore across navigation.
+- The highlight is clamped after every edit, so it never points past the (possibly shrunken) match list — but it does not reset to 0 when the query changes.
 - Pasting works: `handle_paste` inserts the pasted text into the query at the cursor and re-filters the suggestions, just like typing.

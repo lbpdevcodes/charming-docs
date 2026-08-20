@@ -22,17 +22,19 @@ That's the palette wrapped in `CommandPaletteModal` (see below); bare, it render
 
 ## Quick start
 
-Most apps never build the component by hand — they use the controller integration. Declare commands with the `command` class DSL and bind a key to `open_command_palette` (from the journal example):
+Most apps never build the component by hand — they use the opt-in shell integration. Include `Charming::Shell::Palette` in `ApplicationController` (generated apps get this from `charming generate layout`), declare commands with the `command` class DSL, and bind a key to `open_command_palette` (from the journal example):
 
 ```ruby
 class ApplicationController < Charming::Controller
+  include Charming::Shell::Palette
+
   key "ctrl+p", :open_command_palette, scope: :global
 
   command "Entries" do
-    navigate_to "/"
+    navigate :root
   end
   command "Compose" do
-    navigate_to "/compose"
+    navigate :compose
   end
   command "Theme", :open_theme_palette
   command "Quit app", :quit
@@ -57,7 +59,7 @@ def command_palette_modal
 end
 ```
 
-To use the component standalone, build it yourself and persist its `state` hash between events (components are rebuilt every event):
+To use the component standalone, build it yourself and memoize it in an ivar; seed it from its persisted `state` hash when it must survive navigation:
 
 ```ruby
 Charming::Components::CommandPalette.new(
@@ -96,7 +98,7 @@ Filtering is `FuzzyMatcher.filter(query, commands)` — an fzf-style subsequence
 
 ## What it returns
 
-`handle_key` returns `[:selected, command]` on Enter (the whole `Command` object — read `command.value` to act on it), `:cancelled` on Escape, `:handled` for consumed keys, and `nil` otherwise. Used as a focus slot, these invoke `<slot>_selected(command)` and `<slot>_cancelled`; the built-in `ctrl+p` integration instead performs the command and closes the palette for you. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
+`handle_key` returns `[:selected, command]` on Enter (the whole `Command` object — read `command.value` to act on it), `:cancelled` on Escape, `:handled` for consumed keys, and `nil` otherwise. Used as a focus slot, these dispatch the actions declared with `on_select` and `on_cancel`; the shell's `ctrl+p` integration instead performs the command and closes the palette for you. See the [component protocol]({{ '/docs/components/build-your-own/' | relative_url }}).
 
 ## The modal wrapper
 
@@ -117,10 +119,10 @@ It is purely presentational — key handling stays with the `CommandPalette` ins
 - `state` — `{value:, cursor:, selected_index:}`, the exact hash to persist in the session and feed back to `new`.
 - `selected_command` — the currently highlighted `Command`, or nil.
 - `commands` / `input` — the full command list and the inner TextInput.
-- Controller helpers: `open_command_palette`, `close_command_palette`, `command_palette_open?`, and `command_palette` (builds the component from session state, nil when closed).
+- Controller helpers from the palette module: `open_command_palette`, `close_command_palette`, `command_palette_open?`, and `command_palette` (builds the component from session state, nil when closed).
 
 ## Tips
 
-- Persist `palette.state` after every dispatch — the framework's integration does this for you; standalone usage must do it by hand or the query resets each keystroke.
+- The shell integration persists `palette.state` after every dispatch for you. Standalone usage gets screen-lifetime state from a memoized ivar; persist the `state` hash by hand only to survive navigation.
 - `command` bindings are inherited by subclasses, so declare app-wide commands once on `ApplicationController` and add screen-specific ones per controller.
 - Remember the priority rule: an open palette consumes *everything*, including keys you bound with `key ... scope: :global`. Close it (Escape or `close_command_palette`) before expecting bindings to fire.

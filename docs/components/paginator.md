@@ -82,6 +82,6 @@ end
 
 ## Tips
 
-- **Components are rebuilt on every event** — `next_page` advances the in-memory instance, so write the result back to controller state (`archive_state.page = paginator.next_page.page`) and pass it in as `page:` on the next build, or the pager resets to page 0.
+- `next_page` returns a new instance — assign it (`@paginator = @paginator.next_page`) or write the page back to controller state (`archive_state.page = paginator.next_page.page`) and pass it in as `page:` on the next build, or the pager resets to page 0.
 - `page` is 0-based everywhere in the API; only the `:arabic` rendering is 1-based (`2/3` means `page == 1`).
 - Dots render one glyph per page — beyond a dozen or so pages, switch to `format: :arabic`.

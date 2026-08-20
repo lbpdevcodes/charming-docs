@@ -15,7 +15,7 @@ permalink: /docs/components/timer/
 
 ## Quick start
 
-Controllers are rebuilt per dispatch, so track elapsed seconds in [state]({{ '/docs/state/' | relative_url }}) and rebuild the countdown from it:
+Navigation discards the controller instance, so track elapsed seconds in [state]({{ '/docs/state/' | relative_url }}) and rebuild the countdown from it:
 
 ```ruby
 class PomodoroState < ApplicationState
@@ -33,15 +33,17 @@ class PomodoroController < ApplicationController
 
   def advance
     pomodoro.elapsed += 1
-    return navigate_to("/break") if countdown.expired?
+    return navigate(:break) if countdown.expired?
 
     show
   end
 
   private
 
+  # Built fresh each render and replayed from the accumulated seconds — do not
+  # memoize, or each replay would tick the same instance down again.
   def countdown
-    @countdown ||= Charming::Components::Timer.new(duration: DURATION, label: "remaining")
+    Charming::Components::Timer.new(duration: DURATION, label: "remaining")
       .tick(pomodoro.elapsed)
   end
 

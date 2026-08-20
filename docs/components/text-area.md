@@ -19,7 +19,7 @@ The `|` is the rendered cursor marker. With `height:`, the buffer scrolls to kee
 
 ## Quick start
 
-Components are rebuilt on every event, so persist the editor's state in a `component_state` hash and rebuild from it. Expose the component from a memoized method named after a `focus_ring` slot.
+Controllers live for the screen's lifetime, so keep the editor in a memoized ivar exposed from a method named after a `focus_ring` slot.
 
 ```ruby
 class NotesController < Charming::Controller
@@ -28,32 +28,21 @@ class NotesController < Charming::Controller
   key "ctrl+s", :save_note, scope: :global
 
   def show
-    %i[value cursor offset preferred_column].each do |key|
-      editor_state[key] = editor.public_send(key)   # write changes back
-    end
     render :show, editor: editor
   end
 
   def save_note
     Note.create!(body: editor.value)
-    navigate_to "/"
+    navigate :root
   end
 
   private
 
   def editor
     @editor ||= Charming::Components::TextArea.new(
-      value: editor_state[:value],
-      cursor: editor_state[:cursor],
-      offset: editor_state[:offset],
-      preferred_column: editor_state[:preferred_column],
       height: 10,
       placeholder: "Write in Markdown…"
     )
-  end
-
-  def editor_state
-    component_state(:editor, value: "", cursor: 0, offset: 0, preferred_column: nil)
   end
 end
 ```
@@ -99,12 +88,12 @@ Bracketed paste delivers pasted text as one `Charming::Events::PasteEvent`. `Tex
 
 ## Working with it
 
-- `value` / `cursor` / `offset` / `preferred_column` — readers for everything you need to persist between events.
+- `value` / `cursor` / `offset` / `preferred_column` — readers for the editor's full state.
 - `handle_key(event)` / `handle_paste(event)` — usually called for you by focus dispatch.
 - `captures_text?` — returns true.
 
 ## Tips
 
-- Persist all four state readers, not just `value` — dropping `offset` makes long buffers jump to the top on every keystroke, and dropping `preferred_column` makes up/down drift on short lines.
+- The memoized ivar keeps all four state readers between events. When you re-seed a rebuilt editor (say, after navigating away), pass all four back, not just `value` — dropping `offset` makes long buffers jump to the top on every keystroke, and dropping `preferred_column` makes up/down drift on short lines.
 - `enter_newline: false` exists for hosts that need Enter (that's how a widget embedding a TextArea can advance/submit on Enter); users can still get newlines via Shift+Enter/Ctrl+J/Ctrl+N.
-- Don't store the component in the session — live component objects are dropped on persist. Store primitives and rebuild each event.
+- Don't store the component in the session — live component objects are dropped on persist. The memoized ivar covers the screen's lifetime; store primitives in a `state` object when the draft must survive navigation.

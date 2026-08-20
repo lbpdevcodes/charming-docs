@@ -26,16 +26,22 @@ The separator line under the header is trimmed for a compact layout, and the sor
 class ReposController < ApplicationController
   focus_ring :repos
 
+  on_select :repos, :open_repo
+
   def show
+    repos.rows = Repo.all.map { |repo| [repo.name, repo.stars] }
     repos_state.selected_index = repos.selected_index
     render :show, repos_table: repos
   end
 
   # Enter opens the selected row.
-  def repos_selected(row)
-    navigate_to "/repos/#{row.first}"
+  def open_repo(row)
+    navigate :repo, id: row.first
   end
 
+  # The table, memoized so j/k selection survives across events. `show`
+  # refreshes the rows each render — the component holds the interaction
+  # state, the rows always reflect the database.
   def repos
     @repos ||= Charming::Components::Table.new(
       header: ["Name", "Stars"],
@@ -89,7 +95,7 @@ A click within the body area selects the clicked row. The handler subtracts `HEA
 
 | Return value | Meaning |
 |--------------|---------|
-| `[:selected, row]` | Enter pressed — dispatches `<slot>_selected(row)` with the row as constructed (String, Array, or Hash). |
+| `[:selected, row]` | Enter pressed — dispatches the action declared with `on_select` (the action receives the row as constructed: String, Array, or Hash). |
 | `:handled` | A navigation key or click was consumed. |
 | `nil` | The event was not handled. |
 
@@ -98,13 +104,14 @@ See the shared [component protocol]({{ '/docs/components/build-your-own/' | rela
 ## Working with it
 
 - `selected_row` — the highlighted row, or `nil` for an empty table.
+- `rows = new_rows` — replace the body rows after the data changed; the selection reclamps. This is the data-refresh half of the memoized-table pattern.
 - `sort_by!(column, direction: :asc)` — sorts rows by a header label or 0-based index; numeric-looking cells compare numerically, everything else as strings. Returns `self`.
 - `toggle_sort(column)` — sorts by `column`, flipping direction on repeated calls (ascending first). Returns `self`.
 - `header` / `rows` / `selected_index` — readers for the constructor state.
 
 ## Tips
 
-- **Components are rebuilt on every event.** Persist `selected_index` in controller state and pass it back in on construction (see the quick start), or the selection resets on every keypress.
-- Sorting mutates the *instance's* rows — a rebuilt table is unsorted again. Store the sort column and direction in state and reapply `sort_by!` after constructing: `table.sort_by!(state.sort_column, direction: state.sort_direction)`.
-- `toggle_sort` only flips when called twice *on the same instance* for the same column; across rebuilds, track the direction yourself and use `sort_by!`.
+- **Memoize the table, refresh its rows.** Keep the `Table` in an ivar so j/k movement survives across events, and assign `table.rows = new_rows` on each render so the data stays fresh.
+- Sorting mutates the *instance's* rows — a fresh `rows =` assignment discards the sort. Store the sort column and direction in state and reapply `sort_by!` after assigning: `table.sort_by!(state.sort_column, direction: state.sort_direction)`.
+- `toggle_sort` only flips when called twice *on the same instance* for the same column; after a `rows =` refresh, track the direction yourself and use `sort_by!`.
 - With header and rows both empty, `render` returns the placeholder string `(empty table)`.

@@ -95,7 +95,7 @@ The viewport is navigation-only — it returns `:handled` for consumed scroll ke
 
 ## Tips
 
-- **Components are rebuilt on every event** — persist `offset` (and `column`, if you scroll horizontally) into controller state during `show` and pass them back in on construction, exactly as the quick start does. Otherwise every keypress snaps back to the top.
+- **Memoize the viewport in an ivar** (`@pager ||= Components::Viewport.new(...)`) so the scroll position survives across events. The alternative is to persist `offset` (and `column`, if you scroll horizontally) into controller state during `show` and pass it back in on construction — without one of the two, every keypress snaps back to the top.
 - For log tails, construct with `follow: state.following` and after each dispatch store `state.following = viewport.at_bottom?` — the viewport sticks to new content until the user scrolls up, and resumes when they scroll back to the bottom.
 - `wrap: true` needs a positive `width:` and turns off horizontal scrolling (`max column` becomes 0) — wrapped content has nothing to clip sideways.
 - `content:` accepts a renderable (e.g. a `Markdown` component), which is rendered and then windowed — handy for scrollable docs and help screens.

@@ -141,7 +141,7 @@ the built-in error screen instead of crashing the terminal.
 
 Hooks run around *actions* (`dispatch(:show)`, timers, task handlers). They do not run
 on component key dispatch, so any method the focus system can call directly — focus
-slot component builders, component result hooks — must load its own data instead of
+slot component builders, component result handlers — must load its own data instead of
 relying on `before_action` instance variables.
 
 ## Key Bindings
@@ -190,6 +190,8 @@ dismissing keypress:
 ```ruby
 key "?", :open_help, scope: :global
 
+on_cancel :help_overlay, :close_help
+
 def open_help
   session[:help_open] = true
   focus.push_scope([:help_overlay], origin: :modal)
@@ -200,7 +202,7 @@ def help_overlay
   Charming::Components::HelpOverlay.for_controller(self.class, theme: theme)
 end
 
-def help_overlay_cancelled
+def close_help
   session.delete(:help_open)
   focus.pop_scope
   render_default_action
@@ -208,17 +210,27 @@ end
 ```
 
 The layout renders the overlay while `session[:help_open]` is set. Any key dismisses
-it (the component returns `:cancelled`, which calls the `<slot>_cancelled` hook).
+it (the component returns `:cancelled`, which `on_cancel` routes to `close_help`).
+The old `<slot>_cancelled` naming convention still works but emits a one-time
+deprecation warning.
 
 ## Command Palette
 
-Add commands with a method name or block:
+The palette lives outside the controller kernel. Include it in `ApplicationController` to use it (`charming generate layout` adds the include):
+
+```ruby
+class ApplicationController < Charming::Controller
+  include Charming::Shell::Palette
+end
+```
+
+The `command` class DSL comes with the palette module. Add commands with a method name or block:
 
 ```ruby
 command "Refresh", :refresh
 
 command "Home" do
-  navigate_to "/"
+  navigate :root
 end
 ```
 
@@ -229,9 +241,11 @@ Generated apps bind `ctrl+p` globally to `open_command_palette` and include comm
 Use controller helpers to change app flow:
 
 ```ruby
-navigate_to "/settings"
+navigate :settings
 quit
 ```
+
+Pass params at navigate time as Ruby values: `navigate :city, id: city.id`.
 
 These produce `Charming::Response` objects that the runtime interprets.
 

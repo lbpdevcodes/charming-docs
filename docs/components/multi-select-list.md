@@ -23,6 +23,8 @@ The highlighted row renders in the theme's selected style; checked rows get an `
 class InterestsController < ApplicationController
   focus_ring :interests
 
+  on_submit :interests, :submit_interests
+
   def show
     interests_state.selected_index = interests.selected_index
     interests_state.checked = interests.selected_indices
@@ -30,9 +32,9 @@ class InterestsController < ApplicationController
   end
 
   # Enter submits the checked items, in list order.
-  def interests_submitted(items)
+  def submit_interests(items)
     save_interests(items)
-    navigate_to "/"
+    navigate :root
   end
 
   def interests
@@ -86,7 +88,7 @@ Inherited from List: a click within the visible window moves the highlight to th
 
 | Return value | Meaning |
 |--------------|---------|
-| `[:submitted, items]` | Enter pressed — dispatches `<slot>_submitted(items)` with the checked items in list order. |
+| `[:submitted, items]` | Enter pressed — dispatches the action declared with `on_submit` (the action receives the checked items in list order). |
 | `:handled` | A toggle or navigation key was consumed (including a Space toggle refused by `max_selections:`). |
 | `nil` | The event was not handled. |
 
@@ -100,6 +102,6 @@ Note the contrast with List: Enter here means *submit the set*, not *select one 
 
 ## Tips
 
-- **Components are rebuilt on every event**, so persist *both* pieces of state — the highlight (`selected_index`) and the checked set (`selected_indices`) — into controller state and pass them back in on construction, as in the quick start above.
+- **Persist *both* pieces of state** — the highlight (`selected_index`) and the checked set (`selected_indices`) — into controller state and pass them back in on construction, as in the quick start above, or they reset when the screen is re-entered.
 - `selected_indices` are positions in the visible items list. If you combine checkboxes with `filter:`, the indices point into the filtered view — keep the filter stable while collecting selections, or map items yourself.
 - When `max_selections:` is reached, Space on an unchecked item is silently consumed (`:handled`) — nothing is toggled.

@@ -12,9 +12,10 @@ subclasses `Charming::View`. That gives it two things: assigns passed to `new`
 become reader methods, and a `render` method you implement with the view DSL —
 `text`, `box`, `row`, `column`, `render_component`.
 
-One invariant shapes everything on this page: **components are rebuilt on every
-event**. They have no lifecycle, no mount/unmount, no long-lived instance. Any
-state that must survive between keystrokes lives in
+One rule shapes everything on this page: **components have no lifecycle** — no
+mount/unmount. Keep a component with interaction state in a memoized controller
+ivar, where it lives for the screen's lifetime. Any state that must survive
+navigation lives in
 [controller state or session]({{ '/docs/state/' | relative_url }}) and gets
 passed back in through the constructor on the next render.
 
@@ -77,20 +78,21 @@ end
 
 The return value is a protocol the controller understands:
 
-| Return value | Meaning | Controller hook invoked |
-|--------------|---------|-------------------------|
+| Return value | Meaning | Controller action dispatched |
+|--------------|---------|------------------------------|
 | `:handled` | The component consumed the event. | none — the screen re-renders |
-| `[:selected, object]` | The user selected an item. | `<slot>_selected(object)` |
-| `[:submitted, value]` | The user submitted a value. | `<slot>_submitted(value)` |
-| `:cancelled` | The user cancelled the interaction. | `<slot>_cancelled` |
+| `[:selected, object]` | The user selected an item. | declared with `on_select :slot, :action` — the action receives the object |
+| `[:submitted, value]` | The user submitted a value. | declared with `on_submit :slot, :action` — the action receives the value |
+| `:cancelled` | The user cancelled the interaction. | declared with `on_cancel :slot, :action` — the action takes no arguments |
 | `nil` | The component did not handle the event. | none — dispatch continues |
 
 Dispatch works through focus: when no higher-priority handler consumes a key,
 the controller builds the component for the focused slot (by calling the
-controller method named after the slot) and sends it `handle_key`. A hook such
-as `search_selected(item)` only fires if the controller defines it; otherwise
-the default render runs. Returning `nil` lets the event fall through to other
-handlers.
+controller method named after the slot) and sends it `handle_key`. The declared
+action only fires when the component returns the matching result; with no
+declaration, development and test raise `UnhandledComponentEvent` and
+production falls back to the default render. Returning `nil` lets the event
+fall through to other handlers.
 
 ## The KeyboardHandler mixin
 

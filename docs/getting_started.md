@@ -63,11 +63,11 @@ Routes live in `config/routes.rb`:
 ```ruby
 MyApp::Application.routes do
   root "home#show"
-  screen "/cities/:id", to: "cities#show", title: "City"
+  screen :city, "cities#show", title: "City"
 end
 ```
 
-`root` maps `/` to a controller action. `screen` maps a path to `controller#action`. Dynamic route segments are available through `params`.
+`root` registers the reserved `:root` screen. `screen` registers a name for `controller#action`. Pass values to a named screen when you navigate: `navigate :city, id: 5` delivers `params[:id]` to the controller.
 
 Read more in [Routing]({{ '/docs/routing/' | relative_url }}).
 
@@ -130,11 +130,14 @@ Read more in [Controllers & Views]({{ '/docs/controllers-and-views/' | relative_
 
 ## Layouts
 
-Generated apps use a Ruby layout class:
+Generated apps use a Ruby layout class. The sidebar and command palette are opt-in shell modules:
 
 ```ruby
 module MyApp
   class ApplicationController < Charming::Controller
+    include Charming::Shell::Sidebar
+    include Charming::Shell::Palette
+
     layout Layouts::ApplicationLayout
     focus_ring :sidebar, :content
   end
@@ -175,7 +178,7 @@ module MyApp
 end
 ```
 
-Controllers are ephemeral, so use `state(:home, HomeState)` for state that must survive dispatches.
+One controller instance lives for the screen's lifetime, so instance variables hold screen-lifetime state. Use `state(:home, HomeState)` for state that must survive navigation.
 
 Read more in [State]({{ '/docs/state/' | relative_url }}).
 

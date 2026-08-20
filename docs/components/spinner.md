@@ -15,7 +15,7 @@ permalink: /docs/components/spinner/
 
 ## Quick start
 
-Controllers are rebuilt on every dispatch, so keep the frame counter in [state]({{ '/docs/state/' | relative_url }}) and rebuild the spinner from it each render:
+Keep the frame counter in [state]({{ '/docs/state/' | relative_url }}) and rebuild the spinner from it each render — the component is a pure function of the frame index, so rebuilding is cheap and always correct.
 
 ```ruby
 class JobsState < ApplicationState

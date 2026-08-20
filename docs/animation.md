@@ -144,9 +144,9 @@ optional `z:`, defaulting to `0.0`).
 
 ## Where animation state lives
 
-Controllers are ephemeral — a fresh instance is built per event — so spring
-positions and velocities belong in an `ApplicationState` object retrieved
-through `state(:name, StateClass)`:
+Navigation discards the controller instance, so spring positions and
+velocities that must survive it belong in an `ApplicationState` object
+retrieved through `state(:name, StateClass)`:
 
 ```ruby
 class BallState < ApplicationState
