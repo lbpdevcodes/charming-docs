@@ -11,7 +11,7 @@ A terminal reader for Hacker News. Browse the
 top, new, best, Ask HN, Show HN, and jobs feeds, open articles inline, and
 navigate with a Vim-inspired keyboard layout — all themeable with the built-in
 Charming themes. The source lives at
-[pandorocks/hackernews](https://github.com/pandorocks/hackernews) and it
+[lbpdevcodes/hackernews](https://github.com/lbpdevcodes/hackernews) and it
 installs as the [`hackernews`](https://rubygems.org/gems/hackernews) gem.
 
 <img src="{{ '/assets/images/hn-screenshot.webp' | relative_url }}"
@@ -29,7 +29,7 @@ hackernews
 Or from a source checkout:
 
 ```sh
-git clone https://github.com/pandorocks/hackernews
+git clone https://github.com/lbpdevcodes/hackernews
 cd hackernews
 bundle install
 bundle exec hackernews

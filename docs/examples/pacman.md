@@ -11,7 +11,7 @@ A Pac-Man arcade clone built with Charming, showing what the framework looks
 like when the "app" is a real-time game: a render loop driven by timers, a
 board that scales to your terminal, half-block sprite drawing, and SQLite-backed
 high scores. The source lives at
-[pandorocks/pacman](https://github.com/pandorocks/pacman) and it installs as the
+[lbpdevcodes/pacman](https://github.com/lbpdevcodes/pacman) and it installs as the
 [`pacmanrb`](https://rubygems.org/gems/pacmanrb) gem.
 
 <img width="1256" height="1065" alt="Pac-Man running in a terminal" src="https://github.com/user-attachments/assets/72cc474b-f54d-40aa-b622-6e203251e0ca" />
@@ -28,7 +28,7 @@ pacmanrb
 Or from a source checkout:
 
 ```sh
-git clone https://github.com/pandorocks/pacman
+git clone https://github.com/lbpdevcodes/pacman
 cd pacman
 bundle install
 bundle exec pacmanrb

@@ -3,7 +3,7 @@ description: Documentation for the Charming Ruby gem.
 theme: just-the-docs
 color_scheme: synthwave
 
-url: https://pandorocks.github.io
+url: https://lbpdevcodes.github.io
 
 # Callout boxes used in the docs (e.g. {: .note } / {: .important } on a blockquote).
 callouts:
@@ -15,4 +15,4 @@ callouts:
     color: yellow
 
 aux_links:
-  Charming on GitHub: https://github.com/pandorocks/charming
+  Charming on GitHub: https://github.com/lbpdevcodes/charming

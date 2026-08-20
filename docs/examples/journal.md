@@ -10,7 +10,7 @@ permalink: /docs/example-app/
 What the blog tutorial is to Rails, the Journal is to Charming: a complete,
 runnable demo app that exercises every major framework feature. It lives in the
 framework repository at
-[`examples/journal`](https://github.com/pandorocks/charming/tree/main/examples/journal).
+[`examples/journal`](https://github.com/lbpdevcodes/charming/tree/main/examples/journal).
 
 A daily-writing TUI: write entries in Markdown, tag them with a mood, browse and
 reread them, track your writing streak, and export everything to a Markdown file.
