@@ -323,9 +323,23 @@ end
 
 Task results arrive as `Charming::Events::TaskEvent` with `value`, `error`, and `error?`.
 
+### The data-in/data-out rule
+
+Task blocks run on an executor thread. They receive data in via `with:` and return data out as the block value. They touch nothing else — the `on_task` handler on the loop thread is the only place task results become state.
+
+```ruby
+def search
+  run_task(:search, with: {query: query.value}) do |ctx|
+    Api.search(ctx[:query])
+  end
+end
+```
+
+The `with:` hash is deep-frozen at submit time. Mutating it inside the task raises `FrozenError`. Calling `render`, `navigate`, `quit`, `session`, or `focus` from the task thread raises `Charming::CrossThreadAccess` in development and test, and logs a warning in production.
+
 ### Progress streaming
 
-Blocks that accept an argument receive a progress reporter. Each `report` dispatches
+Blocks that accept an argument receive a context whose `report` dispatches
 the matching `on_task_progress` handler with a `TaskProgressEvent` (`current`,
 `total`, `message`, and a `fraction` helper):
 
@@ -334,12 +348,12 @@ on_task :export, action: :export_finished
 on_task_progress :export, action: :export_progressed
 
 def start_export
-  run_task(:export) do |progress|
-    entries.each_with_index do |entry, index|
+  run_task(:export, with: {entries: entries}) do |ctx|
+    ctx[:entries].each_with_index do |entry, index|
       write(entry)
-      progress.report(index + 1, of: entries.length, message: entry.title)
+      ctx.report(index + 1, of: ctx[:entries].length, message: entry.title)
     end
-    entries.length
+    ctx[:entries].length
   end
   show
 end

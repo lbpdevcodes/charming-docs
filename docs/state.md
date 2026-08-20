@@ -51,6 +51,8 @@ def increment
 end
 ```
 
+State objects belong to the loop thread. Task blocks receive data in via `run_task`'s `with:` and return data out as the block value; they never touch state objects directly. The `on_task` handler on the loop thread is the only place task results become state.
+
 ## Initial Attributes
 
 Pass initial attributes through `state`:
