@@ -178,10 +178,31 @@ end
 
 The runtime saves on exit and the application reloads on boot. Only JSON-safe values
 survive: nil, booleans, numbers, strings, symbols, and arrays/hashes of those. Hash
-keys come back as symbols; symbol *values* come back as strings. Everything else —
-state objects, procs — is silently skipped, and the framework always excludes its
-internal keys (`focus_state`, `command_palette`). A corrupt or
+keys come back as symbols; symbol *values* come back as strings. The framework always
+excludes its internal keys (`focus_state`, `command_palette`). A corrupt or
 missing file falls back to an empty session.
+
+State objects persist explicitly. Mark the attributes to keep with `persist`:
+
+```ruby
+class HomeState < Charming::ApplicationState
+  attribute :count, :integer, default: 0
+  attribute :draft, :string, default: ""
+
+  persist :count
+end
+```
+
+On save, each state object serializes as its class name plus its persisted
+attributes. On boot, the application re-instantiates the class with those
+attributes. Unmarked attributes — `draft` above — reinitialize to their
+defaults. A session file that references a renamed class or attribute logs a
+warning and starts that state fresh; it never crashes boot.
+
+Drops are loud, not silent. A state class with no `persist` declarations, or a
+raw session value that is not JSON-safe, warns once per key with a
+`save_session dropped ...` message naming the fix. At 1.0 the warning goes
+away: undeclared means not persisted.
 
 Good candidates: the chosen theme (stored automatically by `use_theme`) and
 scroll positions that must survive restarts. Form drafts live on the controller
